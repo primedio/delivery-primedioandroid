@@ -8,7 +8,8 @@ import android.widget.Button;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.primed.primedioandroid.*;
+import io.primed.primedandroid.Primed;
+import io.primed.primedandroid.PrimedTracker;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -29,12 +30,12 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Map<String, String> signals = new HashMap<String, String>();
+                Map<String, Object> signals = new HashMap<String, Object>();
 
                 signals.put("device", "android");
                 signals.put("userid", "someuserid");
 
-                primed.personalize("frontpage.article.bottom", signals, 3);
+                primed.personalize("frontpage.article.bottom", signals, 3, "A");
             }
         });
 
@@ -42,8 +43,20 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                primed.convert("RUUID_GO_HERE",null);
+                primed.convert("RUUID");
+                primed.convert("RUUID_GO_HERE",  new HashMap<String, Object>());
 
+            }
+        });
+
+        Button button3 = (Button) findViewById(R.id.trackView);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PrimedTracker.ViewEvent event = primedTracker.new ViewEvent();
+                event.uri = "http://www.testapp.com";
+                event.customProperties = "customProp";
+                primedTracker.sendEvent(event);
             }
         });
 

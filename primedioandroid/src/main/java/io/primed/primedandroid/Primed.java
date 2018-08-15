@@ -1,29 +1,22 @@
-package io.primed.primedioandroid;
+package io.primed.primedandroid;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import okio.BufferedSink;
 
 public class Primed {
 
@@ -94,10 +87,16 @@ public class Primed {
 
     }
 
-    private void post(String url, Map<String, String> params, final HttpCallback cb) {
+    private void post(String url, Map<String, Object> params, final HttpCallback cb) {
 
-        RequestBody formBody = new FormEncodingBuilder()
-                .build();
+
+        FormEncodingBuilder builder = new FormEncodingBuilder();
+        if (params != null) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.add(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        RequestBody formBody = builder.build();
 
         Request request = new Request.Builder()
                 .url(url)
@@ -124,11 +123,14 @@ public class Primed {
         });
     }
 
-    public void convert(String ruuid, Map<String, String> data) {
+    public void convert(String ruuid) {
+        this.convert(ruuid, null);
+    }
+    public void convert(String ruuid, Map<String, Object> data) {
 
         String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
 
-       this.post(generateURL, new HashMap(), new Primed.HttpCallback() {
+       this.post(generateURL, data, new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
 
@@ -141,14 +143,23 @@ public class Primed {
        });
     }
 
-    public void personalize(String campaign, Map<String, String> signals, int limit) {
+    private String toJSONString(Map<String, Object> map) {
+        GsonBuilder gsonMapBuilder = new GsonBuilder();
 
-        String signalsString = URLEncoder.encode(signals.toString());
+        Gson gsonObject = gsonMapBuilder.create();
+
+        String JSONObject = gsonObject.toJson(map);
+        return JSONObject;
+    }
+
+    public void personalize(String campaign, Map<String, Object> signals, int limit, String abVariantLabel) {
+
+        String signalsString = URLEncoder.encode(this.toJSONString(signals));
 
         String generateURL = this.urlPrimedIO + "/api/v1/personalise?";
         generateURL += "campaign=" + campaign;
         generateURL += "&limit=" + limit;
-        generateURL += "&abvariant=" + "A";
+        generateURL += "&abvariant=" + abVariantLabel;
         generateURL += "&signals=" + signalsString;
 
         this.get(generateURL, new Primed.HttpCallback() {
