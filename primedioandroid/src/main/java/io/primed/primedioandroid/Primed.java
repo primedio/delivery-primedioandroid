@@ -1,5 +1,7 @@
 package io.primed.primedioandroid;
 
+import android.util.Log;
+
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.MediaType;
@@ -8,33 +10,36 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import okio.BufferedSink;
 
-public class PrimedIO {
+public class Primed {
 
     public final OkHttpClient client = new OkHttpClient();
-    private Request request;
+    public Request request;
     private String urlPrimedIO;
     private String public_key;
     private String nonce;
     private String sha512_signature;
 
 
-    public PrimedIO(String publicKey, String secretKey, String url) {
-        String nonce = String.valueOf(new Date().getTime());
+    public Primed(String publicKey, String secretKey, String url) {
+        String nonce = String.valueOf(System.currentTimeMillis() / 1000l);
 
         String prepSignature = publicKey + secretKey + nonce;
-        String signature = this.createSHA512(prepSignature);
+        String signature = Primed.createSHA512(prepSignature);
 
         this.urlPrimedIO = url;
         this.public_key = publicKey;
@@ -42,38 +47,30 @@ public class PrimedIO {
         this.nonce = nonce;
     }
 
-    private String createSHA512(String input) {
+    public static String createSHA512(String input) {
 
-        String generatedPassword = null;
+        String generatedSHA = null;
 
         try {
             MessageDigest sh = MessageDigest.getInstance("SHA-512");
             sh.update(input.getBytes());
             StringBuffer sb = new StringBuffer();
             for (byte b : sh.digest()) sb.append(String.format("%1$02x", 0xff & b));
-            generatedPassword = sb.toString();
+            generatedSHA = sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        return generatedPassword;
+
+        Log.d("Primed", generatedSHA);
+
+        return generatedSHA;
 
     }
 
     private void get(String url, final HttpCallback cb) {
         Request request = new Request.Builder()
                 .url(url)
-                .method("GET", new RequestBody() {
-                    // don't care much about request body
-                    @Override
-                    public MediaType contentType() {
-                        return null;
-                    }
-
-                    @Override
-                    public void writeTo(BufferedSink sink) throws IOException {
-
-                    }
-                })
+                .method("GET", null)
                 .addHeader("X-Authorization-Key", this.public_key)
                 .addHeader("X-Authorization-Signature", this.sha512_signature)
                 .addHeader("X-Authorization-Nonce", this.nonce)
@@ -98,13 +95,13 @@ public class PrimedIO {
     }
 
     private void post(String url, Map<String, String> params, final HttpCallback cb) {
+
         RequestBody formBody = new FormEncodingBuilder()
-                .add("search", "Jurassic Park")
                 .build();
 
         Request request = new Request.Builder()
                 .url(url)
-                .method("POST",formBody )
+                .method("POST", formBody )
                 .addHeader("X-Authorization-Key", this.public_key)
                 .addHeader("X-Authorization-Signature", this.sha512_signature)
                 .addHeader("X-Authorization-Nonce", this.nonce)
@@ -128,7 +125,10 @@ public class PrimedIO {
     }
 
     public void convert(String ruuid, Map<String, String> data) {
-       this.post("url", new HashMap(), new PrimedIO.HttpCallback() {
+
+        String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
+
+       this.post(generateURL, new HashMap(), new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
 
@@ -141,16 +141,17 @@ public class PrimedIO {
        });
     }
 
-    public void personalize(String campain, Map<String, String> signals, int limit) {
+    public void personalize(String campaign, Map<String, String> signals, int limit) {
 
-        String signalsString = signals.toString();
+        String signalsString = URLEncoder.encode(signals.toString());
 
-        String generateURL = "/api/v1/personalise?";
-        generateURL += "campaign=" + campain;
+        String generateURL = this.urlPrimedIO + "/api/v1/personalise?";
+        generateURL += "campaign=" + campaign;
         generateURL += "&limit=" + limit;
+        generateURL += "&abvariant=" + "A";
         generateURL += "&signals=" + signalsString;
 
-        this.get(generateURL, new PrimedIO.HttpCallback() {
+        this.get(generateURL, new Primed.HttpCallback() {
             @Override
             public void onFailure(Response response, Throwable throwable) {
 
