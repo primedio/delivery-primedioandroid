@@ -2,30 +2,23 @@ package io.primed.primedexample;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 
-import java.security.Permission;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.primed.primedandroid.Primed;
 import io.primed.primedandroid.PrimedTracker;
-import io.primed.primedioexample.R;
 
 
 public class MainActivity extends AppCompatActivity {
-
-    private Primed primed;
-    private PrimedTracker primedTracker;
 
 
     @Override
@@ -33,16 +26,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //get permission to get the deviceID:
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//            new AlertDialog.Builder(this).setTitle("permission_title").setMessage("permission_title").setPo
-            new AlertDialog.Builder(this).setTitle("permission_title").setMessage("permission_title").setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String[] mPermissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS};
-                    requestPermissions(mPermissions, 1);
-                }
-            }).setCancelable(false).show();
-            return;
+            String[] mPermissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS};
+            requestPermissions(mPermissions, 1);
         } else {
             initTrackers();
         }
@@ -56,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 signals.put("device", "android");
                 signals.put("userid", "someuserid");
 
-                primed.personalize("frontpage.recommendations", signals, 3, "A");
+                Primed.getInstance().personalize("frontpage.recommendations", signals, 3, "A");
             }
         });
 
@@ -64,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                primed.convert("RUUID");
-                primed.convert("RUUID_GO_HERE",  new HashMap<String, Object>());
+                Primed.getInstance().convert("RUUID");
+                Primed.getInstance().convert("RUUID_GO_HERE",  new HashMap<String, Object>());
 
             }
         });
@@ -74,22 +61,37 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                PrimedTracker.ViewEvent event = primedTracker.new ViewEvent();
-//                event.uri = "http://www.testapp.com";
-//                event.customProperties = "customProp";
-//                primedTracker.trackEvent(event);
+                PrimedTracker.ViewEvent event = PrimedTracker.getInstance().new ViewEvent();
+                event.uri = "http://www.testapp.com";
+                event.customProperties = "customProp";
+                PrimedTracker.getInstance().trackEvent(event);
 
-                PrimedTracker.HeartbeatEvent beat = primedTracker.new HeartbeatEvent();
-                primedTracker.trackEvent(beat);
-
-//                PrimedTracker.ScrollEvent scrollEvent = primedTracker.new ScrollEvent();
-//                scrollEvent.scrollDirection = PrimedTracker.ScrollDirection.DOWN;
-//                primedTracker.trackEvent(scrollEvent);
+                PrimedTracker.ScrollEvent scrollEvent = PrimedTracker.getInstance().new ScrollEvent();
+                scrollEvent.scrollDirection = PrimedTracker.ScrollDirection.DOWN;
+                PrimedTracker.getInstance().trackEvent(scrollEvent);
             }
         });
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
 
+                if (permission.equals(Manifest.permission.READ_PHONE_STATE)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        initTrackers();
+                        break;
+                    } else {
+                        //no permissions
+                    }
+                }
+            }
 
+        }
     }
 
     @Override
@@ -101,13 +103,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTrackers() {
+        //We we've granted permission:
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager telephonyManager;
             telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
+            //You need to pass the unique device id to the tracker:
             String deviceId = telephonyManager.getImei();
-            primed = new Primed("mypubkey", "mysecretkey", "https://gw.staging.primed.io");
-            primedTracker = new PrimedTracker("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 10, deviceId);
+
+            //To get only a Primed instance for personalize and convert:
+            //primed = new Primed("mypubkey", "mysecretkey", "https://gw.staging.primed.io");
+            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, deviceId);
+        } else {
+            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, "no_device_id");
         }
     }
 }

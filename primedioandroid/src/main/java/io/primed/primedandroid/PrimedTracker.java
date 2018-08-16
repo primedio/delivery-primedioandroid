@@ -10,6 +10,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.github.nkzawa.socketio.client.IO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +25,8 @@ import java.util.UUID;
 
 final public class PrimedTracker {
 
+    private static PrimedTracker sSoleInstance;
+
     private String public_key;
     private String nonce;
     private String trackingConnectionString;
@@ -34,11 +37,27 @@ final public class PrimedTracker {
 
     Timer heartbeatTimer;
 
-    public PrimedTracker(String publicKey, String secretKey, String connectionString, String trackingConnectionString, int heartbeatInterval, String deviceID) {
+    private PrimedTracker() {
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+
+    public static PrimedTracker getInstance(){
+        if (sSoleInstance == null){ //if there is no instance available... create new one
+            sSoleInstance = new PrimedTracker();
+        }
+
+        return sSoleInstance;
+    }
+
+    public void init(String publicKey, String secretKey, String connectionString, String trackingConnectionString, int heartbeatInterval, String deviceID) {
         String nonce = String.valueOf(new Date().getTime());
 
         String prepSignature = publicKey + secretKey + nonce;
         String signature = Primed.createSHA512(prepSignature);
+
+        Primed.getInstance().init(publicKey, secretKey, connectionString);
 
         this.public_key = publicKey;
         this.sha512_signature = signature;
@@ -49,6 +68,7 @@ final public class PrimedTracker {
 
         try {
             mSocket = IO.socket(trackingConnectionString);
+            mSocket.on(Socket.EVENT_MESSAGE, onNewMessage);
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
@@ -59,7 +79,7 @@ final public class PrimedTracker {
 
         }
 
-
+        Primed.getInstance().primedTrackerAvailable = true;
     }
 
     public Emitter.Listener onConnect = new Emitter.Listener() {
@@ -80,12 +100,11 @@ final public class PrimedTracker {
     class HeartbeatTask extends TimerTask {
         public void run() {
             if (mSocket.connected()) {
-
-                HeartbeatEvent beat = new HeartbeatEvent();
-                trackEvent(beat);
-
+                //this seems to disconnect the socket, thread issues?
+                //HeartbeatEvent beat = new HeartbeatEvent();
+                //trackEvent(beat);
             }
-            //heartbeatTimer.cancel(); //Terminate the timer thread
+            //heartbeatTimer.cancel(); //Terminate the timer thread?
         }
     }
 
@@ -110,6 +129,13 @@ final public class PrimedTracker {
         }
     };
 
+    public Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            JSONObject data = (JSONObject) args[0];
+        }
+    };
+
     private Socket mSocket;
 
     public void trackEvent(BaseEvent event) {
@@ -126,21 +152,6 @@ final public class PrimedTracker {
 
     }
 
-    private Emitter.Listener onNewMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            String message;
-            try {
-                username = data.getString("username");
-                message = data.getString("message");
-            } catch (JSONException e) {
-                return;
-            }
-        }
-    };
-
     public class BaseEvent {
         String deviceId = "";
 
@@ -153,14 +164,16 @@ final public class PrimedTracker {
         String sdkVersion = "1.0";
         String type = "";
 
-        Map<String, Object> params;
+        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> eventObject = new HashMap<String, Object>();;
 
         public String toString() {
             return this.toJSONString();
         }
 
         public void createMap() {
-            params = new HashMap<String, Object>();
+            params.clear();
+            eventObject.clear();
             params.put("apiKey", this.apiKey);
             params.put("ts", this.ts);
             params.put("source", this.source);
@@ -169,6 +182,7 @@ final public class PrimedTracker {
             params.put("sdkId", 1);
             params.put("sdkVersion", this.sdkVersion);
             params.put("type", this.eventName.toUpperCase());
+            params.put("eventObject", eventObject);
         }
 
         public String toJSONString() {
@@ -190,10 +204,10 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("x", x);
+            eventObject.put("y", y);
+            eventObject.put("interactionType", interactionType);
             super.createMap();
-            params.put("x", x);
-            params.put("y", y);
-            params.put("interactionType", interactionType);
         }
     }
 
@@ -204,9 +218,9 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("customProperties", customProperties);
+            eventObject.put("uri", uri);
             super.createMap();
-            params.put("customProperties", customProperties);
-            params.put("uri", uri);
         }
     }
 
@@ -216,8 +230,8 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("scrollDirection", scrollDirection);
             super.createMap();
-            params.put("scrollDirection", scrollDirection);
         }
     }
 
@@ -228,9 +242,9 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("campaign", campaign);
+            eventObject.put("elements", elements);
             super.createMap();
-            params.put("campaign", campaign);
-            params.put("elements", elements);
         }
     }
 
@@ -241,9 +255,9 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("campaign", campaign);
+            eventObject.put("elements", elements);
             super.createMap();
-            params.put("campaign", campaign);
-            params.put("elements", elements);
         }
     }
 
@@ -255,10 +269,10 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("latitude",latitude);
+            eventObject.put("longitude",longitude);
+            eventObject.put("accuracy",accuracy);
             super.createMap();
-            params.put("latitude",latitude);
-            params.put("longitude",longitude);
-            params.put("accuracy",accuracy);
         }
     }
 
@@ -267,9 +281,9 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
-            super.createMap();
-            params.put("i", heartbeatCount);
+            eventObject.put("i", heartbeatCount);
             heartbeatCount += 1;
+            super.createMap();
         }
     }
 
@@ -279,8 +293,21 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
+            eventObject.put("customProperties", customProperties);
             super.createMap();
-            params.put("customProperties", customProperties);
+        }
+    }
+
+    final public class PersonalizeEvent extends BaseEvent {
+        public String eventName = "personalise";
+        public Response response;
+
+        public void createMap() {
+            super.eventName = eventName;
+
+            //TODO: convert response to hashmap
+            //eventObject.put("response", response);
+            super.createMap();
         }
     }
 

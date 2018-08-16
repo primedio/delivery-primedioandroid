@@ -20,15 +20,32 @@ import java.util.Map;
 
 public class Primed {
 
+    private static Primed sSoleInstance;
+
     public final OkHttpClient client = new OkHttpClient();
     public Request request;
+    public Boolean primedTrackerAvailable;
     private String urlPrimedIO;
     private String public_key;
     private String nonce;
     private String sha512_signature;
 
 
-    public Primed(String publicKey, String secretKey, String url) {
+    private Primed() {
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+
+    public static Primed getInstance(){
+        if (sSoleInstance == null){ //if there is no instance available... create new one
+            sSoleInstance = new Primed();
+        }
+
+        return sSoleInstance;
+    }
+
+    public void init(String publicKey, String secretKey, String url) {
         String nonce = String.valueOf(System.currentTimeMillis() / 1000l);
 
         String prepSignature = publicKey + secretKey + nonce;
@@ -170,7 +187,11 @@ public class Primed {
 
             @Override
             public void onSuccess(Response response) {
-
+                if (primedTrackerAvailable == true) {
+                    PrimedTracker.PersonalizeEvent event = PrimedTracker.getInstance().new PersonalizeEvent();
+                    event.response = response;
+                    PrimedTracker.getInstance().trackEvent(event);
+                }
             }
         });
 
