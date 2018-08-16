@@ -1,4 +1,4 @@
-package io.primed.primedioexample;
+package io.primed.primedexample;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
