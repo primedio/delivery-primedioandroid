@@ -15,15 +15,18 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Primed {
 
+    public interface PrimedCallback {
+        void onSuccess(String response);
+        void onFailure();
+    }
+
     private static Primed sSoleInstance;
 
     public final OkHttpClient client = new OkHttpClient();
-    public Request request;
     public Boolean primedTrackerAvailable;
     private String urlPrimedIO;
     private String public_key;
@@ -71,7 +74,7 @@ public class Primed {
             throw new RuntimeException(e);
         }
 
-        Log.d("Primed", generatedSHA);
+        Log.d("Primed", "SHA: " + generatedSHA);
 
         return generatedSHA;
 
@@ -140,22 +143,30 @@ public class Primed {
         });
     }
 
-    public void convert(String ruuid) {
-        this.convert(ruuid, null);
+    public void convert(String ruuid, final PrimedCallback callback) {
+        this.convert(ruuid, callback);
     }
-    public void convert(String ruuid, Map<String, Object> data) {
+    public void convert(String ruuid, Map<String, Object> data, final PrimedCallback callback) {
 
         String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
 
        this.post(generateURL, data, new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
-
+                callback.onFailure();
            }
 
            @Override
            public void onSuccess(Response response) {
-
+               String respBody = null;
+               if (response.body() != null) {
+                   try {
+                       respBody = response.body().string();
+                   } catch (IOException e) {
+                       //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                   }
+               }
+               callback.onSuccess(respBody);
            }
        });
     }
@@ -169,7 +180,7 @@ public class Primed {
         return JSONObject;
     }
 
-    public void personalize(String campaign, Map<String, Object> signals, int limit, String abVariantLabel) {
+    public void personalize(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
 
         String signalsString = URLEncoder.encode(this.toJSONString(signals));
 
@@ -182,7 +193,7 @@ public class Primed {
         this.get(generateURL, new Primed.HttpCallback() {
             @Override
             public void onFailure(Response response, Throwable throwable) {
-
+                callback.onFailure();
             }
 
             @Override
@@ -192,6 +203,44 @@ public class Primed {
                     event.response = response;
                     PrimedTracker.getInstance().trackEvent(event);
                 }
+                String respBody = null;
+
+                if (response.body() != null) {
+                    try {
+                        respBody = response.body().string();
+                    } catch (IOException e) {
+                        //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                    }
+                }
+
+                callback.onSuccess(respBody);
+            }
+        });
+
+    }
+
+    public void health(final PrimedCallback callback) {
+
+       String generateURL = this.urlPrimedIO + "/api/v1/health";
+
+       this.get(generateURL, new Primed.HttpCallback() {
+            @Override
+            public void onFailure(Response response, Throwable throwable) {
+                callback.onFailure();
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                String respBody = null;
+
+                if (response.body() != null) {
+                    try {
+                        respBody = response.body().string();
+                    } catch (IOException e) {
+                        //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                    }
+                }
+                callback.onSuccess(respBody);
             }
         });
 

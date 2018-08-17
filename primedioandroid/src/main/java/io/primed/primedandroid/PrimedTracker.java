@@ -12,15 +12,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 final public class PrimedTracker {
@@ -35,7 +32,7 @@ final public class PrimedTracker {
     private int heartbeatInterval;
     private int heartbeatCount;
 
-    Timer heartbeatTimer;
+    Runnable heartbeatRunnable;
 
     private PrimedTracker() {
         if (sSoleInstance != null){
@@ -88,25 +85,28 @@ final public class PrimedTracker {
             Log.d("PrimedTracker", "connected");
 
             //start heartbeat:
-            if (heartbeatInterval > 0) {
+            if (heartbeatInterval > 0 && heartbeatRunnable == null) {
                 heartbeatCount = 1;
 
-                heartbeatTimer = new Timer();
-                heartbeatTimer.schedule(new HeartbeatTask(), heartbeatInterval * 1000);
+
+                heartbeatRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        HeartbeatEvent beat = new HeartbeatEvent();
+                        trackEvent(beat);
+
+                        Handler sHandler = new Handler(Looper.getMainLooper());
+                        sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
+                    }
+                };
+
+                Handler sHandler = new Handler(Looper.getMainLooper());
+                sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
+
             }
         }
     };
 
-    class HeartbeatTask extends TimerTask {
-        public void run() {
-            if (mSocket.connected()) {
-                //this seems to disconnect the socket, thread issues?
-                //HeartbeatEvent beat = new HeartbeatEvent();
-                //trackEvent(beat);
-            }
-            //heartbeatTimer.cancel(); //Terminate the timer thread?
-        }
-    }
 
     public Emitter.Listener onDisconnect = new Emitter.Listener() {
         @Override
@@ -200,7 +200,7 @@ final public class PrimedTracker {
         public String eventName = "click";
         public int x;
         public int y;
-        public String interactionType;
+        public InteractionType interactionType;
 
         public void createMap() {
             super.eventName = eventName;
@@ -308,6 +308,26 @@ final public class PrimedTracker {
             //TODO: convert response to hashmap
             //eventObject.put("response", response);
             super.createMap();
+        }
+    }
+
+    public enum InteractionType {
+        LEFT("LEFT",0),
+        RIGHT("RIGHT",1),
+        MIDDLE("MIDDLE",2),
+        OTHER("OTHER",3),
+        LONGPRESS("LONGPRESS",4);
+
+        private String stringValue;
+        private int intValue;
+        private InteractionType(String toString, int value) {
+            stringValue = toString;
+            intValue = value;
+        }
+
+        @Override
+        public String toString() {
+            return stringValue;
         }
     }
 

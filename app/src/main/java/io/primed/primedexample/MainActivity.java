@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
             initTrackers();
         }
 
+        //Add our button listeners
         Button button = (Button) findViewById(R.id.personalizeButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,7 +44,18 @@ public class MainActivity extends AppCompatActivity {
                 signals.put("device", "android");
                 signals.put("userid", "someuserid");
 
-                Primed.getInstance().personalize("frontpage.recommendations", signals, 3, "A");
+                //Personalize call, handle the response to personalize your data
+                Primed.getInstance().personalize("frontpage.recommendations", signals, 3, "A", new Primed.PrimedCallback() {
+                    @Override
+                    public void onSuccess(String response) {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
             }
         });
 
@@ -51,8 +63,19 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Primed.getInstance().convert("RUUID");
-                Primed.getInstance().convert("RUUID_GO_HERE",  new HashMap<String, Object>());
+
+                //Convert call with callback
+                Primed.getInstance().convert("RUUID_GO_HERE",  new HashMap<String, Object>(), new Primed.PrimedCallback() {
+                    @Override
+                    public void onSuccess(String response) {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
 
             }
         });
@@ -61,11 +84,14 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PrimedTracker.ViewEvent event = PrimedTracker.getInstance().new ViewEvent();
-                event.uri = "http://www.testapp.com";
-                event.customProperties = "customProp";
+                //Click example
+                PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
+                event.x = 1;
+                event.y = 1;
+                event.interactionType = PrimedTracker.InteractionType.LEFT;
                 PrimedTracker.getInstance().trackEvent(event);
 
+                //Scroll example
                 PrimedTracker.ScrollEvent scrollEvent = PrimedTracker.getInstance().new ScrollEvent();
                 scrollEvent.scrollDirection = PrimedTracker.ScrollDirection.DOWN;
                 PrimedTracker.getInstance().trackEvent(scrollEvent);
@@ -86,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                         initTrackers();
                         break;
                     } else {
-                        //no permissions
+                        //no permissions granted, present error?
                     }
                 }
             }
