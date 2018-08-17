@@ -23,7 +23,6 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java" />
-      <change beforePath="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java" afterPath="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java" />
       <change beforePath="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java" afterPath="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -57,11 +56,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-140">
-              <caret line="46" column="80" lean-forward="false" selection-start-line="46" selection-start-column="80" selection-end-line="46" selection-end-column="80" />
+            <state relative-caret-position="386">
+              <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1314#2055#0" expanded="true" />
@@ -71,6 +70,8 @@
                 <element signature="e#2685#2686#0" expanded="true" />
                 <element signature="e#2789#3520#0" expanded="true" />
                 <element signature="e#3519#3520#0" expanded="true" />
+                <element signature="e#3621#4091#0" expanded="true" />
+                <element signature="e#4090#4091#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -104,8 +105,8 @@
       <file leaf-file-name="Primed.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2651">
-              <caret line="241" column="17" lean-forward="false" selection-start-line="241" selection-start-column="17" selection-end-line="241" selection-end-column="17" />
+            <state relative-caret-position="3360">
+              <caret line="235" column="0" lean-forward="false" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2892#2893#0" expanded="true" />
@@ -131,25 +132,27 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PrimedTracker.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PrimedTracker.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="302">
-              <caret line="202" column="30" lean-forward="false" selection-start-line="202" selection-start-column="30" selection-end-line="202" selection-end-column="30" />
+            <state relative-caret-position="-296">
+              <caret line="170" column="0" lean-forward="false" selection-start-line="170" selection-start-column="0" selection-end-line="170" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2680#3593#0" expanded="true" />
-                <element signature="e#2997#3405#0" expanded="true" />
-                <element signature="e#3404#3405#0" expanded="true" />
-                <element signature="e#3592#3593#0" expanded="true" />
-                <element signature="e#3640#3799#0" expanded="true" />
-                <element signature="e#3798#3799#0" expanded="true" />
-                <element signature="e#3847#4007#0" expanded="true" />
-                <element signature="e#4006#4007#0" expanded="true" />
-                <element signature="e#4202#4361#0" expanded="true" />
-                <element signature="e#4360#4361#0" expanded="true" />
-                <element signature="e#5136#5152#0" expanded="true" />
-                <element signature="e#5209#5225#0" expanded="true" />
+                <element signature="e#2806#3719#0" expanded="true" />
+                <element signature="e#3123#3531#0" expanded="true" />
+                <element signature="e#3530#3531#0" expanded="true" />
+                <element signature="e#3718#3719#0" expanded="true" />
+                <element signature="e#3766#3925#0" expanded="true" />
+                <element signature="e#3924#3925#0" expanded="true" />
+                <element signature="e#3973#4133#0" expanded="true" />
+                <element signature="e#4132#4133#0" expanded="true" />
+                <element signature="e#4546#5158#0" expanded="true" />
+                <element signature="e#4739#4909#0" expanded="true" />
+                <element signature="e#4908#4909#0" expanded="true" />
+                <element signature="e#5157#5158#0" expanded="true" />
+                <element signature="e#5967#5983#0" expanded="true" />
+                <element signature="e#6040#6056#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -196,6 +199,13 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>com.github.nkzawa.socketio.</find>
+      <find>gson</find>
+      <find>did</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -3222,8 +3232,8 @@
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java" />
-        <option value="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java" />
+        <option value="$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java" />
       </list>
     </option>
   </component>
@@ -3521,29 +3531,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="23" width="1920" height="1178" extended-state="6" />
+    <frame x="1" y="23" width="1920" height="1178" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.48509052" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.48296058" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32963988" sideWeight="0.5186368" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30932593" sideWeight="0.20607029" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.49361023" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.49574015" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32963988" sideWeight="0.48136315" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.47071353" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23822714" sideWeight="0.57933974" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23822714" sideWeight="0.5766773" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32963988" sideWeight="0.4978701" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39981532" sideWeight="0.80990416" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30932593" sideWeight="0.7939297" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -3565,13 +3575,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java</url>
-          <line>125</line>
-          <properties />
-          <option name="timeStamp" value="67" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java</url>
-          <line>104</line>
+          <line>123</line>
           <properties />
           <option name="timeStamp" value="68" />
         </line-breakpoint>
@@ -3587,8 +3591,32 @@
           <properties />
           <option name="timeStamp" value="79" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java</url>
+          <line>157</line>
+          <properties />
+          <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java</url>
+          <line>149</line>
+          <properties />
+          <option name="timeStamp" value="84" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java</url>
+          <line>145</line>
+          <properties />
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java</url>
+          <line>235</line>
+          <properties />
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="83" />
+      <option name="time" value="103" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -3641,6 +3669,8 @@
             <element signature="e#2685#2686#0" expanded="true" />
             <element signature="e#2789#3520#0" expanded="true" />
             <element signature="e#3519#3520#0" expanded="true" />
+            <element signature="e#3621#4091#0" expanded="true" />
+            <element signature="e#4090#4091#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3711,18 +3741,20 @@
           <caret line="68" column="23" lean-forward="false" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2680#3593#0" expanded="true" />
-            <element signature="e#2997#3405#0" expanded="true" />
-            <element signature="e#3404#3405#0" expanded="true" />
-            <element signature="e#3592#3593#0" expanded="true" />
-            <element signature="e#3640#3799#0" expanded="true" />
-            <element signature="e#3798#3799#0" expanded="true" />
-            <element signature="e#3847#4007#0" expanded="true" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4202#4361#0" expanded="true" />
-            <element signature="e#4360#4361#0" expanded="true" />
-            <element signature="e#5136#5152#0" expanded="true" />
-            <element signature="e#5209#5225#0" expanded="true" />
+            <element signature="e#2806#3719#0" expanded="true" />
+            <element signature="e#3123#3531#0" expanded="true" />
+            <element signature="e#3530#3531#0" expanded="true" />
+            <element signature="e#3718#3719#0" expanded="true" />
+            <element signature="e#3766#3925#0" expanded="true" />
+            <element signature="e#3924#3925#0" expanded="true" />
+            <element signature="e#3973#4133#0" expanded="true" />
+            <element signature="e#4132#4133#0" expanded="true" />
+            <element signature="e#4546#5158#0" expanded="true" />
+            <element signature="e#4739#4909#0" expanded="true" />
+            <element signature="e#4908#4909#0" expanded="true" />
+            <element signature="e#5157#5158#0" expanded="true" />
+            <element signature="e#5967#5983#0" expanded="true" />
+            <element signature="e#6040#6056#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3759,6 +3791,8 @@
             <element signature="e#2685#2686#0" expanded="true" />
             <element signature="e#2789#3520#0" expanded="true" />
             <element signature="e#3519#3520#0" expanded="true" />
+            <element signature="e#3621#4091#0" expanded="true" />
+            <element signature="e#4090#4091#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3815,18 +3849,20 @@
           <caret line="38" column="14" lean-forward="false" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="14" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2680#3593#0" expanded="true" />
-            <element signature="e#2997#3405#0" expanded="true" />
-            <element signature="e#3404#3405#0" expanded="true" />
-            <element signature="e#3592#3593#0" expanded="true" />
-            <element signature="e#3640#3799#0" expanded="true" />
-            <element signature="e#3798#3799#0" expanded="true" />
-            <element signature="e#3847#4007#0" expanded="true" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4202#4361#0" expanded="true" />
-            <element signature="e#4360#4361#0" expanded="true" />
-            <element signature="e#5136#5152#0" expanded="true" />
-            <element signature="e#5209#5225#0" expanded="true" />
+            <element signature="e#2806#3719#0" expanded="true" />
+            <element signature="e#3123#3531#0" expanded="true" />
+            <element signature="e#3530#3531#0" expanded="true" />
+            <element signature="e#3718#3719#0" expanded="true" />
+            <element signature="e#3766#3925#0" expanded="true" />
+            <element signature="e#3924#3925#0" expanded="true" />
+            <element signature="e#3973#4133#0" expanded="true" />
+            <element signature="e#4132#4133#0" expanded="true" />
+            <element signature="e#4546#5158#0" expanded="true" />
+            <element signature="e#4739#4909#0" expanded="true" />
+            <element signature="e#4908#4909#0" expanded="true" />
+            <element signature="e#5157#5158#0" expanded="true" />
+            <element signature="e#5967#5983#0" expanded="true" />
+            <element signature="e#6040#6056#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3870,6 +3906,8 @@
             <element signature="e#2685#2686#0" expanded="true" />
             <element signature="e#2789#3520#0" expanded="true" />
             <element signature="e#3519#3520#0" expanded="true" />
+            <element signature="e#3621#4091#0" expanded="true" />
+            <element signature="e#4090#4091#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -4076,8 +4114,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/Primed.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2651">
-          <caret line="241" column="17" lean-forward="false" selection-start-line="241" selection-start-column="17" selection-end-line="241" selection-end-column="17" />
+        <state relative-caret-position="3360">
+          <caret line="235" column="0" lean-forward="false" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2892#2893#0" expanded="true" />
@@ -4092,32 +4130,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="202" column="30" lean-forward="false" selection-start-line="202" selection-start-column="30" selection-end-line="202" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2680#3593#0" expanded="true" />
-            <element signature="e#2997#3405#0" expanded="true" />
-            <element signature="e#3404#3405#0" expanded="true" />
-            <element signature="e#3592#3593#0" expanded="true" />
-            <element signature="e#3640#3799#0" expanded="true" />
-            <element signature="e#3798#3799#0" expanded="true" />
-            <element signature="e#3847#4007#0" expanded="true" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4202#4361#0" expanded="true" />
-            <element signature="e#4360#4361#0" expanded="true" />
-            <element signature="e#5136#5152#0" expanded="true" />
-            <element signature="e#5209#5225#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/io/primed/primedexample/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-140">
-          <caret line="46" column="80" lean-forward="false" selection-start-line="46" selection-start-column="80" selection-end-line="46" selection-end-column="80" />
+        <state relative-caret-position="386">
+          <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1314#2055#0" expanded="true" />
@@ -4127,6 +4143,32 @@
             <element signature="e#2685#2686#0" expanded="true" />
             <element signature="e#2789#3520#0" expanded="true" />
             <element signature="e#3519#3520#0" expanded="true" />
+            <element signature="e#3621#4091#0" expanded="true" />
+            <element signature="e#4090#4091#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/primedioandroid/src/main/java/io/primed/primedandroid/PrimedTracker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-296">
+          <caret line="170" column="0" lean-forward="false" selection-start-line="170" selection-start-column="0" selection-end-line="170" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2806#3719#0" expanded="true" />
+            <element signature="e#3123#3531#0" expanded="true" />
+            <element signature="e#3530#3531#0" expanded="true" />
+            <element signature="e#3718#3719#0" expanded="true" />
+            <element signature="e#3766#3925#0" expanded="true" />
+            <element signature="e#3924#3925#0" expanded="true" />
+            <element signature="e#3973#4133#0" expanded="true" />
+            <element signature="e#4132#4133#0" expanded="true" />
+            <element signature="e#4546#5158#0" expanded="true" />
+            <element signature="e#4739#4909#0" expanded="true" />
+            <element signature="e#4908#4909#0" expanded="true" />
+            <element signature="e#5157#5158#0" expanded="true" />
+            <element signature="e#5967#5983#0" expanded="true" />
+            <element signature="e#6040#6056#0" expanded="true" />
           </folding>
         </state>
       </provider>

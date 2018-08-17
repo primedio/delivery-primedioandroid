@@ -97,6 +97,25 @@ public class MainActivity extends AppCompatActivity {
                 PrimedTracker.getInstance().trackEvent(scrollEvent);
             }
         });
+
+        Button button4 = (Button) findViewById(R.id.button4);
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Health example, 200 = ok
+                Primed.getInstance().health(new Primed.PrimedCallback() {
+                    @Override
+                    public void onSuccess(String response) {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
+            }
+        });
     }
 
     @Override
