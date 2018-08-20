@@ -4,10 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Ack;
-import com.github.nkzawa.socketio.client.Socket;
-import com.github.nkzawa.socketio.client.IO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Response;
@@ -19,6 +15,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import io.socket.client.Ack;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 final public class PrimedTracker {
 
@@ -68,7 +69,11 @@ final public class PrimedTracker {
         this.heartbeatInterval = heartbeatInterval;
 
         try {
-            mSocket = IO.socket(trackingConnectionString);
+            IO.Options options = new IO.Options();
+            options.reconnection = true;
+            options.forceNew = true;
+
+            mSocket = IO.socket(trackingConnectionString, options);
             mSocket.on(Socket.EVENT_MESSAGE, onNewMessage);
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
@@ -211,7 +216,8 @@ final public class PrimedTracker {
 
         public JSONObject toJSONObject() {
             this.createMap();
-            return new JSONObject(params);
+            JSONObject obj = new JSONObject(params);
+            return obj;
         }
         public String toJSONString() {
             this.createMap();
@@ -235,7 +241,7 @@ final public class PrimedTracker {
             super.eventName = eventName;
             super.eventObject.put("x", x);
             super.eventObject.put("y", y);
-            super.eventObject.put("interactionType", interactionType);
+            super.eventObject.put("interactionType", interactionType.stringValue);
             super.createMap();
         }
     }
@@ -259,7 +265,7 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventName;
-            super.eventObject.put("scrollDirection", scrollDirection);
+            super.eventObject.put("scrollDirection", scrollDirection.stringValue);
             super.createMap();
         }
     }
