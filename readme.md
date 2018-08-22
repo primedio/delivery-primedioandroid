@@ -1,13 +1,6 @@
-
-# Installation with Maven
-
-```ruby
-TODO
-```
-
 # Installation
 
-```ruby
+```java
 TODO
 ```
 
@@ -138,7 +131,7 @@ InteractionType interactionType;
 **ViewEvent**
 ```java
 String uri
-String customProperties
+public Map<String, Object> customProperties
 ```
 
 **ScrollEvent**

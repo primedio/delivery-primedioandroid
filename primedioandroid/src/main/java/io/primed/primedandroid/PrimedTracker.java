@@ -249,7 +249,7 @@ final public class PrimedTracker {
     final public class ViewEvent extends BaseEvent {
         private String eventName = "view";
         public String uri;
-        public String customProperties;
+        public Map<String, Object> customProperties;
 
         public void createMap() {
             super.eventName = eventName;
