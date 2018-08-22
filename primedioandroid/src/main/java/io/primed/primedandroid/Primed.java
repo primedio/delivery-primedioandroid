@@ -143,41 +143,32 @@ public class Primed {
         });
     }
 
-    public void convert(String ruuid, final PrimedCallback callback) {
-        this.convert(ruuid, callback);
+    public void convert(String ruuid) {
+        this.convert(ruuid);
     }
-    public void convert(String ruuid, Map<String, Object> data, final PrimedCallback callback) {
+    public void convert(String ruuid, Map<String, Object> data) {
 
         String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
 
        this.post(generateURL, data, new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
-                callback.onFailure();
+               //do nothing?
            }
 
            @Override
            public void onSuccess(Response response) {
-               String respBody = null;
-               if (response.body() != null) {
-                   try {
-                       respBody = response.body().string();
-                   } catch (IOException e) {
-                       //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
-                   }
-               }
-               callback.onSuccess(respBody);
+//               String respBody = null;
+//               if (response.body() != null) {
+//                   try {
+//                       respBody = response.body().string();
+//                   } catch (IOException e) {
+//                       //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+//                   }
+//               }
+               //do nothing?
            }
        });
-    }
-
-    private String toJSONString(Map<String, Object> map) {
-        GsonBuilder gsonMapBuilder = new GsonBuilder();
-
-        Gson gsonObject = gsonMapBuilder.create();
-
-        String JSONObject = gsonObject.toJson(map);
-        return JSONObject;
     }
 
     public void personalize(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
@@ -244,6 +235,15 @@ public class Primed {
             }
         });
 
+    }
+
+    private String toJSONString(Map<String, Object> map) {
+        GsonBuilder gsonMapBuilder = new GsonBuilder();
+
+        Gson gsonObject = gsonMapBuilder.create();
+
+        String JSONObject = gsonObject.toJson(map);
+        return JSONObject;
     }
 
     public interface HttpCallback  {

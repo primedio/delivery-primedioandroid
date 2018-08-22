@@ -232,7 +232,7 @@ final public class PrimedTracker {
     }
 
     final public class ClickEvent extends BaseEvent {
-        public String eventName = "click";
+        private String eventName = "click";
         public int x;
         public int y;
         public InteractionType interactionType;
@@ -247,7 +247,7 @@ final public class PrimedTracker {
     }
 
     final public class ViewEvent extends BaseEvent {
-        public String eventName = "view";
+        private String eventName = "view";
         public String uri;
         public String customProperties;
 
@@ -260,7 +260,7 @@ final public class PrimedTracker {
     }
 
     final public class ScrollEvent extends BaseEvent {
-        public String eventName = "scroll";
+        private String eventName = "scroll";
         public ScrollDirection scrollDirection;
 
         public void createMap() {
@@ -271,7 +271,7 @@ final public class PrimedTracker {
     }
 
     final public class EnterViewportEvent extends BaseEvent {
-        public String eventName = "enterViewPort";
+        private String eventName = "enterViewPort";
         public String campaign;
         public int[] elements;
 
@@ -284,7 +284,7 @@ final public class PrimedTracker {
     }
 
     final public class ExitViewportEvent extends BaseEvent {
-        public String eventName = "exitViewPort";
+        private String eventName = "exitViewPort";
         public String campaign;
         public int[] elements;
 
@@ -297,7 +297,7 @@ final public class PrimedTracker {
     }
 
     final public class PositionChangeEvent extends BaseEvent {
-        public String eventName = "positionchange";
+        private String eventName = "positionchange";
         public float latitude;
         public float longitude;
         public float accuracy;
@@ -312,7 +312,7 @@ final public class PrimedTracker {
     }
 
     final public class HeartbeatEvent extends BaseEvent {
-        public String eventName = "heartbeat";
+        private String eventName = "heartbeat";
 
         public void createMap() {
             super.eventName = eventName;
@@ -323,7 +323,7 @@ final public class PrimedTracker {
     }
 
     final public class CustomEvent extends BaseEvent {
-        public String eventName = "custom";
+        private String eventName = "custom";
         public Map<String, Object> customProperties;
 
         public void createMap() {
@@ -334,7 +334,7 @@ final public class PrimedTracker {
     }
 
     final public class PersonalizeEvent extends BaseEvent {
-        public String eventName = "personalise";
+        private String eventName = "personalise";
         public Response response;
 
         public void createMap() {

@@ -63,19 +63,12 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Map<String, Object> data = new HashMap<String, Object>();
 
+                data.put("device", "android");
+                data.put("userid", "someuserid");
                 //Convert call with callback
-                Primed.getInstance().convert("RUUID_GO_HERE",  new HashMap<String, Object>(), new Primed.PrimedCallback() {
-                    @Override
-                    public void onSuccess(String response) {
-
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
+                Primed.getInstance().convert("RUUID_GO_HERE",  data);
 
             }
         });
@@ -158,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
             //To get only a Primed instance for personalize and convert:
             //primed = new Primed("mypubkey", "mysecretkey", "https://gw.staging.primed.io");
+            Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
             PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, deviceId);
         } else {
             PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, "no_device_id");
