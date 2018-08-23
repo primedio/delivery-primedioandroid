@@ -163,3 +163,14 @@ float accuracy
 ```java
 Map<String, Object> customProperties
 ```
+
+**StartEvent**
+```java
+String uri
+Map<String, Object> customProperties
+```
+
+**EndEvent**
+```java
+no properties
+```
