@@ -1,8 +1,12 @@
 package io.primed.primedandroid;
 
+import android.content.Context;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,6 +39,8 @@ final public class PrimedTracker {
     private int heartbeatInterval;
     private int heartbeatCount;
 
+    public Context context;
+
     Runnable heartbeatRunnable;
 
     private PrimedTracker() {
@@ -51,7 +57,7 @@ final public class PrimedTracker {
         return sSoleInstance;
     }
 
-    public void init(String publicKey, String secretKey, String connectionString, String trackingConnectionString, int heartbeatInterval, String deviceID) {
+    public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval, String deviceID) {
         String nonce = String.valueOf(new Date().getTime());
 
         String prepSignature = publicKey + secretKey + nonce;
@@ -66,6 +72,7 @@ final public class PrimedTracker {
         this.sid = UUID.randomUUID().toString();
         this.trackingConnectionString = trackingConnectionString;
         this.connectionString = connectionString;
+        this.context = context;
         this.heartbeatInterval = heartbeatInterval;
 
         try {
@@ -324,6 +331,51 @@ final public class PrimedTracker {
 
     final public class CustomEvent extends BaseEvent {
         private String eventName = "custom";
+        public Map<String, Object> customProperties;
+
+        public void createMap() {
+            super.eventName = eventName;
+            super.eventObject.put("customProperties", customProperties);
+            super.createMap();
+        }
+    }
+
+    final public class StartEvent extends BaseEvent {
+        private String eventName = "start";
+        public String uri;
+        public Map<String, Object> customProperties;
+
+        public void createMap() {
+            String manufacturer = android.os.Build.MANUFACTURER;
+            String model = android.os.Build.MODEL;
+            String result = model;
+            if (model.startsWith(manufacturer)) {
+                result = model;
+            }
+           else {
+                result = manufacturer + " " + model;
+            }
+
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+
+            super.eventName = eventName;
+            super.eventObject.put("customProperties", customProperties);
+            super.eventObject.put("uri", uri);
+            super.eventObject.put("ua",result);
+            super.eventObject.put("now", String.valueOf(new Date(System.currentTimeMillis())));
+            super.eventObject.put("screenWidth", String.valueOf(size.x));
+            super.eventObject.put("screenHeight",  String.valueOf(size.y));
+            super.eventObject.put("viewPortWidth",  String.valueOf(size.x));
+            super.eventObject.put("viewPortHeight",  String.valueOf(size.y));
+            super.createMap();
+        }
+    }
+
+    final public class EndEvent extends BaseEvent {
+        private String eventName = "end";
         public Map<String, Object> customProperties;
 
         public void createMap() {

@@ -77,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                PrimedTracker.StartEvent e = PrimedTracker.getInstance().new StartEvent();
+                e.uri = "http://test";
+                PrimedTracker.getInstance().trackEvent(e);
+
                 //Click example
                 PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
                 event.x = 1;
@@ -152,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
             //To get only a Primed instance for personalize and convert:
             //primed = new Primed("mypubkey", "mysecretkey", "https://gw.staging.primed.io");
             Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
-            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, deviceId);
+            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30, deviceId);
         } else {
-            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", "http://18.191.69.104:5001/v1", 30, "no_device_id");
+            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30, "no_device_id");
         }
     }
 }
