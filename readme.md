@@ -105,7 +105,8 @@ EXAMPLE RETURN VALUE:
 # Usage Primed Tracker
 ## Initialisation
 ``` java
-PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "API_URL_HERE", "WEBSOCKET_URL_GO_HERE", 30, "DEVICE_ID_HERE");
+note: you need to pass the context of the activity
+PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "API_URL_HERE", context, "WEBSOCKET_URL_GO_HERE", 30, "DEVICE_ID_HERE");
 ```
 
 ## TRACK EVENTS  (ASYNC):
@@ -161,4 +162,15 @@ float accuracy
 **CustomEvent**
 ```java
 Map<String, Object> customProperties
+```
+
+**StartEvent**
+```java
+String uri
+Map<String, Object> customProperties
+```
+
+**EndEvent**
+```java
+no properties
 ```
