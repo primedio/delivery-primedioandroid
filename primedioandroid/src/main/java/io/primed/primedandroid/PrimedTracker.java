@@ -287,26 +287,22 @@ final public class PrimedTracker {
 
     final public class EnterViewportEvent extends BaseEvent {
         private String eventName = "enterViewPort";
-        public String campaign;
-        public int[] elements;
+        public Map<String, Object> customProperties;
 
         public void createMap() {
             super.eventName = eventName;
-            super.eventObject.put("campaign", campaign);
-            super.eventObject.put("elements", elements);
+            super.eventObject.put("customProperties", customProperties);
             super.createMap();
         }
     }
 
     final public class ExitViewportEvent extends BaseEvent {
         private String eventName = "exitViewPort";
-        public String campaign;
-        public int[] elements;
+        public Map<String, Object> customProperties;
 
         public void createMap() {
             super.eventName = eventName;
-            super.eventObject.put("campaign", campaign);
-            super.eventObject.put("elements", elements);
+            super.eventObject.put("customProperties", customProperties);
             super.createMap();
         }
     }
