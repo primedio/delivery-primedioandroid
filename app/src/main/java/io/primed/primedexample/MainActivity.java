@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 //Scroll example
                 PrimedTracker.ScrollEvent scrollEvent = PrimedTracker.getInstance().new ScrollEvent();
                 scrollEvent.scrollDirection = PrimedTracker.ScrollDirection.DOWN;
+                scrollEvent.distance = 12; // pixels
                 PrimedTracker.getInstance().trackEvent(scrollEvent);
             }
         });

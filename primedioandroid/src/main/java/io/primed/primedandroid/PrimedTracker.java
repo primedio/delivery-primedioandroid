@@ -269,6 +269,7 @@ final public class PrimedTracker {
     final public class ScrollEvent extends BaseEvent {
         private String eventName = "scroll";
         public ScrollDirection scrollDirection;
+        public int distance;
 
         public void createMap() {
             super.eventName = eventName;
