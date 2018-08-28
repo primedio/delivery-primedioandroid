@@ -167,7 +167,7 @@ Primed.getInstance().personalise("frontpage.article.bottom", signals, 3, "A", ne
 | campaign | String | Yes | campaign key for which personalisation is retrieved | `frontpage.recommendations` |
 | signals | Map<String, String> | No (defaults to `{}`) | key, value pairs of signals (itemId currently being viewed, deviceId, location, etc.) | `{itemId: '1234', userId: 'xyz'}` |
 | limit | int | No (defaults to `5`) | number of desired results | `10` |
-| abvariant | String | No (defaults to `WRANDOM` assignment) | specify A/B variant for which to retrieve personalisation | `__CONTROL__` |
+| abvariantLabel | String | No (defaults to `WRANDOM` assignment) | specify A/B variant for which to retrieve personalisation | `__CONTROL__` |
 | callback | PrimedCallback | Yes | callback definition for success and failure |  |
 
 EXAMPLE RETURN VALUE:
