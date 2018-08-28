@@ -171,7 +171,7 @@ public class Primed {
        });
     }
 
-    public void personalize(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
+    public void personalise(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
 
         String signalsString = URLEncoder.encode(this.toJSONString(signals));
 

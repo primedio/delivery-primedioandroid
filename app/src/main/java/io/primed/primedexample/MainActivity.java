@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
                 signals.put("device", "android");
                 signals.put("userid", "someuserid");
 
-                //Personalize call, handle the response to personalize your data
-                Primed.getInstance().personalize("frontpage.recommendations", signals, 3, "A", new Primed.PrimedCallback() {
+                //Personalise call, handle the response to personalise your data
+                Primed.getInstance().personalise("frontpage.recommendations", signals, 3, "A", new Primed.PrimedCallback() {
                     @Override
                     public void onSuccess(String response) {
 
