@@ -195,7 +195,7 @@ Map<String, Object> customProperties
 ```
 
 **EndEvent**
-Sends a end event to Primed. The event expects arguments.
+Sends a end event to Primed. The event expects no arguments.
 ```java
 no properties
 ```
