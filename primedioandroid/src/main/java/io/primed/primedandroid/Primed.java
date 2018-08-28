@@ -190,7 +190,7 @@ public class Primed {
             @Override
             public void onSuccess(Response response) {
                 if (primedTrackerAvailable == true) {
-                    PrimedTracker.PersonalizeEvent event = PrimedTracker.getInstance().new PersonalizeEvent();
+                    PrimedTracker.PersonaliseEvent event = PrimedTracker.getInstance().new PersonaliseEvent();
                     event.response = response;
                     PrimedTracker.getInstance().trackEvent(event);
                 }
