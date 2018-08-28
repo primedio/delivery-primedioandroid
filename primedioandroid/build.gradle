@@ -44,9 +44,7 @@ dependencies {
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
-//    implementation('com.github.nkzawa:socket.io-client:0.6.0') {
-//        exclude group: 'org.json', module: 'json'
-//    }
+
     compile ('io.socket:socket.io-client:1.0.0') {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'

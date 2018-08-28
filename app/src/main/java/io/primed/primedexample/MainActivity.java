@@ -26,13 +26,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //get permission to get the deviceID:
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            String[] mPermissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS};
-            requestPermissions(mPermissions, 1);
-        } else {
-            initTrackers();
-        }
+        //Init Primed trackers
+        initTrackers();
 
         //Add our button listeners
         Button button = (Button) findViewById(R.id.personalizeButton);
@@ -68,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 data.put("device", "android");
                 data.put("userid", "someuserid");
                 //Convert call with callback
-                Primed.getInstance().convert("RUUID_GO_HERE",  data);
+                Primed.getInstance().convert("RUUID_GO_HERE", data);
 
             }
         });
@@ -117,50 +112,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            for (int i = 0; i < permissions.length; i++) {
-                String permission = permissions[i];
-                int grantResult = grantResults[i];
-
-                if (permission.equals(Manifest.permission.READ_PHONE_STATE)) {
-                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                        initTrackers();
-                        break;
-                    } else {
-                        //no permissions granted, present error?
-                    }
-                }
-            }
-
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == 0) {
-            initTrackers();
-        }
-    }
-
     private void initTrackers() {
-        //We we've granted permission:
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            TelephonyManager telephonyManager;
-            telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        //To get only a Primed instance for personalize and convert:
+        Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
+        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30);
 
-            //You need to pass the unique device id to the tracker:
-            String deviceId = telephonyManager.getImei();
-
-            //To get only a Primed instance for personalize and convert:
-            //primed = new Primed("mypubkey", "mysecretkey", "https://gw.staging.primed.io");
-            Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
-            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30, deviceId);
-        } else {
-            PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30, "no_device_id");
-        }
     }
 }

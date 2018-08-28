@@ -24,6 +24,7 @@ import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import android.provider.Settings.Secure;
 
 final public class PrimedTracker {
 
@@ -40,6 +41,7 @@ final public class PrimedTracker {
     private int heartbeatCount;
 
     public Context context;
+    public Map<String, Object> customBasicProperties;
 
     Runnable heartbeatRunnable;
 
@@ -57,7 +59,7 @@ final public class PrimedTracker {
         return sSoleInstance;
     }
 
-    public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval, String deviceID) {
+    public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval) {
         String nonce = String.valueOf(new Date().getTime());
 
         String prepSignature = publicKey + secretKey + nonce;
@@ -65,10 +67,12 @@ final public class PrimedTracker {
 
         Primed.getInstance().init(publicKey, secretKey, connectionString);
 
+        String android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+
         this.public_key = publicKey;
         this.sha512_signature = signature;
         this.nonce = nonce;
-        this.did = deviceID;
+        this.did = android_id;
         this.sid = UUID.randomUUID().toString();
         this.trackingConnectionString = trackingConnectionString;
         this.connectionString = connectionString;
@@ -219,6 +223,9 @@ final public class PrimedTracker {
             params.put("sdkVersion", this.sdkVersion);
             params.put("type", this.eventName.toUpperCase());
             params.put("eventObject", eventObject);
+            if (customBasicProperties != null) {
+                params.put("customProperties", customBasicProperties);
+            }
         }
 
         public JSONObject toJSONObject() {
