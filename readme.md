@@ -26,7 +26,7 @@ PrimedTracker
     );
 ```
 
-## TRACK EVENTS (ASYNC):
+## Track events (ASYNC):
 ```java
 //Create the event
 PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
@@ -38,7 +38,7 @@ event.interactionType = PrimedTracker.InteractionType.LEFT;
 PrimedTracker.getInstance().trackEvent(event);
 ```
 
-## AVAILABLE EVENTS:
+## Available events:
 **ClickEvent**
 Sends a click event to Primed.
 ``` java
@@ -121,7 +121,7 @@ no properties
 Primed.getInstance().init("mypubkey", "mysecretkey", "API_URL_HERE");
 ```
 
-## CONVERT (ASYNC):
+## Convert (ASYNC):
 ``` java
 //Optional data
 Map<String, Object> data = new HashMap<String, Object>();  
@@ -132,7 +132,7 @@ data.put("userid", "someuserid");
 Primed.getInstance().convert("RUUID_GO_HERE", data);
 ```
 
-## PERSONALISE (ASYNC):
+## Personalise (ASYNC):
 ``` java
 Map<String, Object> signals = new HashMap<String, Object>();  
   
