@@ -148,7 +148,7 @@ Map<String, Object> signals = new HashMap<String, Object>();
 signals.put("device", "android");  
 signals.put("userid", "someuserid");  
   
-//Personalize call, handle the response to personalize your data  
+//Personalise call, handle the response to personalise your data  
 Primed.getInstance().personalise("frontpage.article.bottom", signals, 3, "A", new Primed.PrimedCallback() {  
     @Override  
     public void onSuccess(String response) {  
