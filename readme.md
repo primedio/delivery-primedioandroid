@@ -175,11 +175,18 @@ float accuracy
 
 **CustomEvent**
 User defined event. For example defining a custom `VIDEOSTART` event, which takes one custom property (itemId), looks as follows:
-```
-PrimedTracker pt = PrimedTracker(...);
+```java
+//Populate customProperties
 Map<String, Object> props = new HashMap<String, Object>();
 props.put("itemId", "abc123");
-pt.trackCustomEvent("VIDEOSTART", props);
+
+//Create the event
+PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new CustomEvent();
+event.eventType = "VIDEOSTART";
+event.customProperties = props;
+
+//Send it to the tracker
+PrimedTracker.getInstance().trackEvent(event);
 ```
 
 ```java
