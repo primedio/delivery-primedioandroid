@@ -393,7 +393,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class PersonalizeEvent extends BaseEvent {
+    final public class PersonaliseEvent extends BaseEvent {
         private String eventName = "personalise";
         public Response response;
 

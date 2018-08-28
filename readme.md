@@ -35,7 +35,7 @@ signals.put("device", "android");
 signals.put("userid", "someuserid");  
   
 //Personalize call, handle the response to personalize your data  
-Primed.getInstance().personalize("frontpage.article.bottom", signals, 3, "A", new Primed.PrimedCallback() {  
+Primed.getInstance().personalise("frontpage.article.bottom", signals, 3, "A", new Primed.PrimedCallback() {  
     @Override  
     public void onSuccess(String response) {  
   
