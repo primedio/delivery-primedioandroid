@@ -26,7 +26,7 @@ PrimedTracker
     );
 ```
 
-## TRACK EVENTS  (ASYNC):
+## TRACKING (ASYNC):
 ```java
 //Create the event
 PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
@@ -38,7 +38,7 @@ event.interactionType = PrimedTracker.InteractionType.LEFT;
 PrimedTracker.getInstance().trackEvent(event);
 ```
 
-## AVAILABLE WEB SOCKET EVENTS:
+## AVAILABLE EVENTS:
 **ClickEvent**
 Sends a click event to Primed.
 ``` java
