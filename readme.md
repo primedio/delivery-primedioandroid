@@ -1,8 +1,17 @@
 # Installation
 
-```java
-TODO
+From source:
+
+```sh
+gradle build
 ```
+
+or add the following to your gradle.build file
+
+```
+compile 'io.primed:primedioandroid:<VERSION>'
+```
+
 
 ### Import Modules
 ```java
@@ -21,7 +30,7 @@ PrimedTracker
         "mysecretkey", 
         "API_URL_HERE", 
         context, 
-        "WEBSOCKET_URL_GO_HERE", 
+        "COLLECTOR_URL_HERE", 
         30
     );
 ```
