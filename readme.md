@@ -1,17 +1,23 @@
 # Installation
 
-From source:
-
-```sh
-gradle build
-```
-
-or add the following to your gradle.build file
+Add the following to your gradle.build file
 
 ```
 compile 'io.primed:primedioandroid:<VERSION>'
 ```
 
+Update build.gradle to include the bintray repo, and add the dependency
+```java
+repositories {
+    maven {
+        url  "https://dl.bintray.com/primedio/maven"
+    }
+}
+
+dependencies {
+	implementation 'io.primed:primedioandroid:<VERSION>'
+}
+```
 
 ### Import Modules
 ```java
