@@ -1,22 +1,35 @@
 # Installation
 
-From source:
-
-```sh
-gradle build
-```
-
-or add the following to your gradle.build file
+Add the following to your gradle.build file
 
 ```
 compile 'io.primed:primedioandroid:<VERSION>'
 ```
 
+Update build.gradle to include the bintray repo, and add the dependency
+```java
+repositories {
+    maven {
+        url  "https://dl.bintray.com/primedio/maven"
+    }
+}
+
+dependencies {
+	implementation 'io.primed:primedioandroid:<VERSION>'
+}
+```
 
 ### Import Modules
 ```java
 import io.primed.primedandroid.Primed;  
 import io.primed.primedandroid.PrimedTracker;
+```
+
+### User Permissions
+Include the following permissions to your AndroidManifest
+```java
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
 # Usage Primed Tracker
