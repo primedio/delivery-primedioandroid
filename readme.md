@@ -19,6 +19,13 @@ import io.primed.primedandroid.Primed;
 import io.primed.primedandroid.PrimedTracker;
 ```
 
+### User Permissions
+Include the following permissions to your AndroidManifest
+```java
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
 # Usage Primed Tracker
 ## Initialisation
 ``` java

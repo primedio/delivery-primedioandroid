@@ -204,6 +204,7 @@ final public class PrimedTracker {
         String source = "app";
         String sdkVersion = "1.0";
         String type = "";
+        String ipAddress = Utils.getIPAddress(true);
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -223,6 +224,7 @@ final public class PrimedTracker {
             params.put("sdkVersion", this.sdkVersion);
             params.put("type", this.eventName.toUpperCase());
             params.put("eventObject", eventObject);
+            params.put("ipaddress", ipAddress);
             if (customBasicProperties != null) {
                 params.put("customProperties", customBasicProperties);
             }
