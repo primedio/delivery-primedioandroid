@@ -48,6 +48,17 @@ PrimedTracker
     );
 ```
 
+## Accessing device and session id
+``` java
+String deviceId = PrimedTracker
+    .getInstance()
+    .getDid();
+
+ String sessionId = PrimedTracker
+    .getInstance()
+    .getSid();
+```
+
 ## Track events (ASYNC):
 ```java
 //Create the event

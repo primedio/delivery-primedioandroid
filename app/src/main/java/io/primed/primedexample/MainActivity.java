@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         //To get only a Primed instance for personalize and convert:
         Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
         PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30);
-
+        PrimedTracker.getInstance().getDid()
+        PrimedTracker.getInstance().getSid()
     }
 }

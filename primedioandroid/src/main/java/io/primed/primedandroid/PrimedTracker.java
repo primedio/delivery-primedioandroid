@@ -34,14 +34,23 @@ final public class PrimedTracker {
     private String nonce;
     private String trackingConnectionString;
     private String connectionString;
-    private String sid;
-    private String did;
     private String sha512_signature;
     private int heartbeatInterval;
     private int heartbeatCount;
 
+    private String sid;
+    private String did;
+
     public Context context;
     public Map<String, Object> customBasicProperties;
+
+    public String getDid() {
+        return did;
+    }
+
+    public String getSid() {
+        return did;
+    }
 
     Runnable heartbeatRunnable;
 
