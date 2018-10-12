@@ -11,10 +11,14 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Primed {
@@ -191,7 +195,25 @@ public class Primed {
             public void onSuccess(Response response) {
                 if (primedTrackerAvailable == true) {
                     PrimedTracker.PersonaliseEvent event = PrimedTracker.getInstance().new PersonaliseEvent();
-                    event.response = response;
+                    try {
+                        String jsonData = response.body().string();
+                        JSONObject responseJSON = new JSONObject(jsonData);
+
+                        String ts = String.valueOf(System.currentTimeMillis() / 1000l);
+                        String guuid = responseJSON.getString("guuid");
+
+                        Map<String, Object> params = new HashMap<String, Object>();
+                        params.put("ts", ts);
+                        params.put("guuid", guuid);
+
+                        GsonBuilder gsonMapBuilder = new GsonBuilder();
+                        Gson gsonObject = gsonMapBuilder.create();
+                        String jsonResponse = gsonObject.toJson(params);
+
+                        event.response = jsonResponse;
+                    } catch (Exception e) {
+
+                    }
                     PrimedTracker.getInstance().trackEvent(event);
                 }
                 String respBody = null;
