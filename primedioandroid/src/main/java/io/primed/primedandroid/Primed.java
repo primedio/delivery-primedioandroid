@@ -198,12 +198,10 @@ public class Primed {
                     try {
                         String jsonData = response.body().string();
                         JSONObject responseJSON = new JSONObject(jsonData);
-
-                        String ts = String.valueOf(System.currentTimeMillis() / 1000l);
+                        
                         String guuid = responseJSON.getString("guuid");
 
                         Map<String, Object> params = new HashMap<String, Object>();
-                        params.put("ts", ts);
                         params.put("guuid", guuid);
 
                         GsonBuilder gsonMapBuilder = new GsonBuilder();
