@@ -198,7 +198,7 @@ public class Primed {
                     try {
                         String jsonData = response.body().string();
                         JSONObject responseJSON = new JSONObject(jsonData);
-                        
+
                         String guuid = responseJSON.getString("guuid");
 
                         Map<String, Object> params = new HashMap<String, Object>();

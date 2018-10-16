@@ -92,6 +92,7 @@ final public class PrimedTracker {
             IO.Options options = new IO.Options();
             options.reconnection = true;
             options.forceNew = true;
+            options.transports = ['websocket'];
 
             mSocket = IO.socket(trackingConnectionString, options);
             mSocket.on(Socket.EVENT_MESSAGE, onNewMessage);
