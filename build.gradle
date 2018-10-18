@@ -40,7 +40,7 @@ task clean(type: Delete) {
 ext {
     // primedIO Library Info
     targetSdkVersion = 27
-    minSdkVersion = 26
+    minSdkVersion = 19
     compileSdkVersion = targetSdkVersion
     buildToolsVersion = '27.0.3'
     supportLibVersion = '27.0.2'

@@ -11,16 +11,20 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Primed {
 
     public interface PrimedCallback {
-        void onSuccess(String response);
+        void onSuccess(JSONObject response);
         void onFailure();
     }
 
@@ -171,7 +175,25 @@ public class Primed {
        });
     }
 
+    public void personalise(String campaign, int limit, String abVariantLabel, final PrimedCallback callback) {
+        HashMap<String, Object> signals = new HashMap<>();
+        if (primedTrackerAvailable == true) {
+            signals.put("did", PrimedTracker.getInstance().getDid());
+        }
+
+        this.personalise(campaign, signals, limit, abVariantLabel, callback);
+    }
+
     public void personalise(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
+
+        if (primedTrackerAvailable == true) {
+            //this will set the system defaults
+            HashMap<String, Object> systemSignals = new HashMap<>();
+            signals.put("did", PrimedTracker.getInstance().getDid());
+
+            //Merge them together (will override existing values in the provided signals)
+            signals.putAll(systemSignals);
+        }
 
         String signalsString = URLEncoder.encode(this.toJSONString(signals));
 
@@ -191,7 +213,15 @@ public class Primed {
             public void onSuccess(Response response) {
                 if (primedTrackerAvailable == true) {
                     PrimedTracker.PersonaliseEvent event = PrimedTracker.getInstance().new PersonaliseEvent();
-                    event.response = response;
+                    try {
+                        String jsonData = response.body().string();
+                        JSONObject responseJSON = new JSONObject(jsonData);
+
+                        String guuid = responseJSON.getString("guuid");
+                        event.guuid = guuid;
+                    } catch (Exception e) {
+
+                    }
                     PrimedTracker.getInstance().trackEvent(event);
                 }
                 String respBody = null;
@@ -204,7 +234,14 @@ public class Primed {
                     }
                 }
 
-                callback.onSuccess(respBody);
+                //Try to parse the response as json, and perform callback
+                try {
+                    JSONObject responseJSON = new JSONObject(respBody);
+                    callback.onSuccess(responseJSON);
+                } catch (Exception e) {
+                    //parsing was not successful, pass an empty object
+                    callback.onSuccess(new JSONObject());
+                }
             }
         });
 
@@ -231,7 +268,15 @@ public class Primed {
                         //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
                     }
                 }
-                callback.onSuccess(respBody);
+
+                //Try to parse the response as json, and perform callback
+                try {
+                    JSONObject responseJSON = new JSONObject(respBody);
+                    callback.onSuccess(responseJSON);
+                } catch (Exception e) {
+                    //parsing was not successful
+                    callback.onSuccess(new JSONObject());
+                }
             }
         });
 

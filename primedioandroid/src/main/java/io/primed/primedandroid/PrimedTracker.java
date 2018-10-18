@@ -24,6 +24,8 @@ import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.engineio.client.transports.WebSocket;
+
 import android.provider.Settings.Secure;
 
 final public class PrimedTracker {
@@ -34,14 +36,23 @@ final public class PrimedTracker {
     private String nonce;
     private String trackingConnectionString;
     private String connectionString;
-    private String sid;
-    private String did;
     private String sha512_signature;
     private int heartbeatInterval;
     private int heartbeatCount;
 
+    private String sid;
+    private String did;
+
     public Context context;
     public Map<String, Object> customBasicProperties;
+
+    public String getDid() {
+        return did;
+    }
+
+    public String getSid() {
+        return did;
+    }
 
     Runnable heartbeatRunnable;
 
@@ -83,6 +94,7 @@ final public class PrimedTracker {
             IO.Options options = new IO.Options();
             options.reconnection = true;
             options.forceNew = true;
+            options.transports = new String[] { WebSocket.NAME };
 
             mSocket = IO.socket(trackingConnectionString, options);
             mSocket.on(Socket.EVENT_MESSAGE, onNewMessage);
@@ -394,13 +406,11 @@ final public class PrimedTracker {
 
     final public class PersonaliseEvent extends BaseEvent {
         private String eventName = "personalise";
-        public Response response;
+        public String guuid;
 
         public void createMap() {
             super.eventName = eventName;
-
-            //TODO: convert response to hashmap
-            //eventObject.put("response", response);
+            eventObject.put("guuid", guuid);
             super.createMap();
         }
     }

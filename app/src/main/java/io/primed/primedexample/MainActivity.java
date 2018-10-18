@@ -11,6 +11,8 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 //Personalise call, handle the response to personalise your data
                 Primed.getInstance().personalise("frontpage.recommendations", signals, 3, "A", new Primed.PrimedCallback() {
                     @Override
-                    public void onSuccess(String response) {
+                    public void onSuccess(JSONObject responseObject) {
 
                     }
 
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 //Health example, 200 = ok
                 Primed.getInstance().health(new Primed.PrimedCallback() {
                     @Override
-                    public void onSuccess(String response) {
+                    public void onSuccess(JSONObject responseObject) {
 
                     }
 
@@ -116,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         //To get only a Primed instance for personalize and convert:
         Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
         PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30);
-
+        PrimedTracker.getInstance().getDid();
+        PrimedTracker.getInstance().getSid();
     }
 }
