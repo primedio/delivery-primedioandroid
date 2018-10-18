@@ -185,12 +185,14 @@ public class Primed {
 
     public void personalise(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
 
-        //this will set the system defaults
-        HashMap<String, Object> systemSignals = new HashMap<>();
-        signals.put("did", PrimedTracker.getInstance().getDid());
+        if (primedTrackerAvailable == true) {
+            //this will set the system defaults
+            HashMap<String, Object> systemSignals = new HashMap<>();
+            signals.put("did", PrimedTracker.getInstance().getDid());
 
-        //Merge them together (will override existing values in the provided signals)
-        signals.putAll(systemSignals);
+            //Merge them together (will override existing values in the provided signals)
+            signals.putAll(systemSignals);
+        }
 
         String signalsString = URLEncoder.encode(this.toJSONString(signals));
 
