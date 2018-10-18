@@ -177,8 +177,9 @@ public class Primed {
 
     public void personalise(String campaign, int limit, String abVariantLabel, final PrimedCallback callback) {
         HashMap<String, Object> signals = new HashMap<>();
-
-        signals.put("did", PrimedTracker.getInstance().getDid());
+        if (primedTrackerAvailable == true) {
+            signals.put("did", PrimedTracker.getInstance().getDid());
+        }
 
         this.personalise(campaign, signals, limit, abVariantLabel, callback);
     }
