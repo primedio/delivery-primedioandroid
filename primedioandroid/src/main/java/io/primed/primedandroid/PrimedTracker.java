@@ -406,13 +406,11 @@ final public class PrimedTracker {
 
     final public class PersonaliseEvent extends BaseEvent {
         private String eventName = "personalise";
-        public String response;
+        public String guuid;
 
         public void createMap() {
             super.eventName = eventName;
-
-            //TODO: convert response to hashmap
-            //eventObject.put("response", response);
+            eventObject.put("guuid", guuid);
             super.createMap();
         }
     }

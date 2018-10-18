@@ -24,7 +24,7 @@ import java.util.Map;
 public class Primed {
 
     public interface PrimedCallback {
-        void onSuccess(String response);
+        void onSuccess(JSONObject response);
         void onFailure();
     }
 
@@ -217,15 +217,7 @@ public class Primed {
                         JSONObject responseJSON = new JSONObject(jsonData);
 
                         String guuid = responseJSON.getString("guuid");
-
-                        Map<String, Object> params = new HashMap<String, Object>();
-                        params.put("guuid", guuid);
-
-                        GsonBuilder gsonMapBuilder = new GsonBuilder();
-                        Gson gsonObject = gsonMapBuilder.create();
-                        String jsonResponse = gsonObject.toJson(params);
-
-                        event.response = jsonResponse;
+                        event.guuid = guuid;
                     } catch (Exception e) {
 
                     }
@@ -241,7 +233,14 @@ public class Primed {
                     }
                 }
 
-                callback.onSuccess(respBody);
+                //Try to parse the response as json, and perform callback
+                try {
+                    JSONObject responseJSON = new JSONObject(respBody);
+                    callback.onSuccess(responseJSON);
+                } catch (Exception e) {
+                    //parsing was not successful, pass an empty object
+                    callback.onSuccess(new JSONObject());
+                }
             }
         });
 
@@ -268,7 +267,15 @@ public class Primed {
                         //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
                     }
                 }
-                callback.onSuccess(respBody);
+
+                //Try to parse the response as json, and perform callback
+                try {
+                    JSONObject responseJSON = new JSONObject(respBody);
+                    callback.onSuccess(responseJSON);
+                } catch (Exception e) {
+                    //parsing was not successful
+                    callback.onSuccess(new JSONObject());
+                }
             }
         });
 
