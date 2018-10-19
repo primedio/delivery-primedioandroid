@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
@@ -51,7 +52,7 @@ final public class PrimedTracker {
     }
 
     public String getSid() {
-        return did;
+        return sid;
     }
 
     Runnable heartbeatRunnable;
@@ -85,7 +86,7 @@ final public class PrimedTracker {
         this.nonce = nonce;
         this.did = android_id;
         this.sid = UUID.randomUUID().toString();
-        this.trackingConnectionString = trackingConnectionString;
+        this.trackingConnectionString = trackingConnectionString + "/v1";
         this.connectionString = connectionString;
         this.context = context;
         this.heartbeatInterval = heartbeatInterval;
@@ -96,7 +97,7 @@ final public class PrimedTracker {
             options.forceNew = true;
             options.transports = new String[] { WebSocket.NAME };
 
-            mSocket = IO.socket(trackingConnectionString, options);
+            mSocket = IO.socket(this.trackingConnectionString, options);
             mSocket.on(Socket.EVENT_MESSAGE, onNewMessage);
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
@@ -114,12 +115,11 @@ final public class PrimedTracker {
     public Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Log.d("PrimedTracker", "connected");
+            Log.d("PrimedTracker", String.format("connected to %s", trackingConnectionString));
 
             //start heartbeat:
             if (heartbeatInterval > 0 && heartbeatRunnable == null) {
                 heartbeatCount = 1;
-
 
                 heartbeatRunnable = new Runnable() {
                     @Override
@@ -150,23 +150,17 @@ final public class PrimedTracker {
     public Emitter.Listener onConnectError = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Log.d("PrimedTracker", "connect error");
+            Log.d("PrimedTracker", String.format("error connecting to %s", trackingConnectionString));
         }
     };
 
     public Emitter.Listener onError = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-
+            Log.d("PrimedTracker", "message error");
         }
     };
 
-//    public Emitter.Listener onNewMessage = new Emitter.Listener() {
-//        @Override
-//        public void call(final Object... args) {
-//            JSONObject data = (JSONObject) args[0];
-//        }
-//    };
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
@@ -179,13 +173,6 @@ final public class PrimedTracker {
                 }
             }, 0);
 
-
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    JSONObject data = (JSONObject) args[0];
-//                }
-//            });
         };
     };
 
@@ -194,29 +181,23 @@ final public class PrimedTracker {
     public void trackEvent(BaseEvent event) {
         event.createMap();
 
-        Log.d("PrimedTracker", String.format("emitting: %s",event.eventName));
+        event.eventName = event.eventName.toUpperCase();
 
-        mSocket.emit("event", event.toJSONObject(), new Ack() {
-            @Override
-            public void call(Object... args) {
+        Log.d("PrimedTracker", String.format("emitting: %s", event.eventName));
 
-            }
-        });
+        JSONObject obj = event.toJSONObject();
 
+        mSocket.emit("event", obj);
     }
 
     public class BaseEvent {
-        String deviceId = "";
-
         public String eventName = "";
         String apiKey = public_key;
-        String ts = String.valueOf(System.currentTimeMillis() / 1000l);
+        String ts = String.valueOf(System.currentTimeMillis());
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
-        String source = "app";
-        String sdkVersion = "1.0";
-        String type = "";
-        String ipAddress = Utils.getIPAddress(true);
+        String source = "APP";
+        String sdkVersion = "-1";
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -227,7 +208,7 @@ final public class PrimedTracker {
 
         public void createMap() {
             params.clear();
-            params.put("apiKey", this.apiKey);
+            params.put("apikey", this.apiKey);
             params.put("ts", this.ts);
             params.put("source", this.source.toUpperCase());
             params.put("sid", this.sid);
@@ -236,7 +217,6 @@ final public class PrimedTracker {
             params.put("sdkVersion", this.sdkVersion);
             params.put("type", this.eventName.toUpperCase());
             params.put("eventObject", eventObject);
-            params.put("ipaddress", ipAddress);
             if (customBasicProperties != null) {
                 params.put("customProperties", customBasicProperties);
             }
@@ -368,10 +348,7 @@ final public class PrimedTracker {
             String manufacturer = android.os.Build.MANUFACTURER;
             String model = android.os.Build.MODEL;
             String result = model;
-            if (model.startsWith(manufacturer)) {
-                result = model;
-            }
-           else {
+            if (model.startsWith(manufacturer) == false) {
                 result = manufacturer + " " + model;
             }
 
