@@ -51,7 +51,7 @@ final public class PrimedTracker {
     }
 
     public String getSid() {
-        return did;
+        return sid;
     }
 
     Runnable heartbeatRunnable;
