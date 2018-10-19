@@ -117,8 +117,17 @@ public class MainActivity extends AppCompatActivity {
     private void initTrackers() {
         //To get only a Primed instance for personalize and convert:
         Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
-        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"http://18.191.69.104:5001/v1", 30);
-        PrimedTracker.getInstance().getDid();
-        PrimedTracker.getInstance().getSid();
+        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"https://collector.staging.regiolab.primed.io:443", 30);
+        String did = PrimedTracker.getInstance().getDid();
+        String sid = PrimedTracker.getInstance().getSid();
+
+        PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
+        event.x = 100;
+        event.y = 50;
+        event.interactionType = PrimedTracker.InteractionType.LEFT;
+
+        //Send it to the tracker
+        PrimedTracker.getInstance().trackEvent(event);
+
     }
 }

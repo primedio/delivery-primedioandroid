@@ -181,12 +181,7 @@ final public class PrimedTracker {
 
         Log.d("PrimedTracker", String.format("emitting: %s",event.eventName));
 
-        mSocket.emit("event", event.toJSONObject(), new Ack() {
-            @Override
-            public void call(Object... args) {
-
-            }
-        });
+        mSocket.emit("event", event.toJSONObject());
 
     }
 
