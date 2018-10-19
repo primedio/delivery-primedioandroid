@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -115,19 +116,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTrackers() {
+
         //To get only a Primed instance for personalize and convert:
         Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
-        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"https://collector.staging.regiolab.primed.io:443", 30);
+        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"https://collector.staging.primed.io", 30);
         String did = PrimedTracker.getInstance().getDid();
         String sid = PrimedTracker.getInstance().getSid();
-
-        PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
-        event.x = 100;
-        event.y = 50;
-        event.interactionType = PrimedTracker.InteractionType.LEFT;
-
-        //Send it to the tracker
-        PrimedTracker.getInstance().trackEvent(event);
 
     }
 }
