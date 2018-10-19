@@ -120,7 +120,6 @@ final public class PrimedTracker {
             if (heartbeatInterval > 0 && heartbeatRunnable == null) {
                 heartbeatCount = 1;
 
-
                 heartbeatRunnable = new Runnable() {
                     @Override
                     public void run() {
@@ -161,13 +160,6 @@ final public class PrimedTracker {
         }
     };
 
-//    public Emitter.Listener onNewMessage = new Emitter.Listener() {
-//        @Override
-//        public void call(final Object... args) {
-//            JSONObject data = (JSONObject) args[0];
-//        }
-//    };
-
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -179,13 +171,6 @@ final public class PrimedTracker {
                 }
             }, 0);
 
-
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    JSONObject data = (JSONObject) args[0];
-//                }
-//            });
         };
     };
 
@@ -206,17 +191,13 @@ final public class PrimedTracker {
     }
 
     public class BaseEvent {
-        String deviceId = "";
-
         public String eventName = "";
         String apiKey = public_key;
-        String ts = String.valueOf(System.currentTimeMillis() / 1000l);
+        String ts = String.valueOf(System.currentTimeMillis());
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "app";
         String sdkVersion = "1.0";
-        String type = "";
-        String ipAddress = Utils.getIPAddress(true);
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -236,7 +217,6 @@ final public class PrimedTracker {
             params.put("sdkVersion", this.sdkVersion);
             params.put("type", this.eventName.toUpperCase());
             params.put("eventObject", eventObject);
-            params.put("ipaddress", ipAddress);
             if (customBasicProperties != null) {
                 params.put("customProperties", customBasicProperties);
             }
@@ -368,10 +348,7 @@ final public class PrimedTracker {
             String manufacturer = android.os.Build.MANUFACTURER;
             String model = android.os.Build.MODEL;
             String result = model;
-            if (model.startsWith(manufacturer)) {
-                result = model;
-            }
-           else {
+            if (model.startsWith(manufacturer) == false) {
                 result = manufacturer + " " + model;
             }
 
