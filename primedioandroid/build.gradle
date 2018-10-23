@@ -66,7 +66,7 @@ ext {
     testRunnerVersion = "1.0.1"
     espressoCoreVersion = "3.0.1"
     libVersionCode = 0
-    libVersionName = '0.0.4'
+    libVersionName = "0.0.5"
 
     //For bintray and jcenter distribution
     bintrayRepo = 'maven'
@@ -81,7 +81,7 @@ ext {
     siteUrl = 'https://www.primed.io'
     gitUrl = 'https://gitlab.com/primedio/delivery-primedioandroid'
 
-    libraryVersion = '0.0.4'
+    libraryVersion = "0.0.5"
 
     developerId = 'mvdkroon'
     developerName = 'Matthijs van der Kroon'

@@ -1,6 +1,8 @@
 package io.primed.primedandroid;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import io.primed.primedioandroid.BuildConfig;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -197,7 +200,7 @@ final public class PrimedTracker {
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "APP";
-        String sdkVersion = "-1";
+        String sdkVersion = "0.0.5";
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -328,12 +331,11 @@ final public class PrimedTracker {
     }
 
     final public class CustomEvent extends BaseEvent {
-        private String eventName = "custom";
-        public String eventType = "";
+        private String eventType;
         public Map<String, Object> customProperties;
 
         public void createMap() {
-            super.eventName = eventName;
+            super.eventName = eventType;
             super.eventObject.put("customProperties", customProperties);
             super.createMap();
         }
