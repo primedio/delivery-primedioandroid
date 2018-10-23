@@ -331,7 +331,7 @@ final public class PrimedTracker {
     }
 
     final public class CustomEvent extends BaseEvent {
-        private String eventType;
+        public String eventType;
         public Map<String, Object> customProperties;
 
         public void createMap() {
