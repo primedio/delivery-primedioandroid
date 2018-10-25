@@ -330,7 +330,10 @@ final public class PrimedTracker {
 
         public void createMap() {
             super.eventName = eventType;
-            super.eventObject.put("customProperties", customProperties);
+            for (Map.Entry<String, Object> entry : customProperties.entrySet()) {
+                super.eventObject.put(entry.getKey(), entry.getValue());
+            }
+
             super.createMap();
         }
     }

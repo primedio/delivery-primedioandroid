@@ -14,8 +14,12 @@ import android.widget.Button;
 
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import io.primed.primedandroid.Primed;
 import io.primed.primedandroid.PrimedTracker;
@@ -92,6 +96,17 @@ public class MainActivity extends AppCompatActivity {
                 scrollEvent.scrollDirection = PrimedTracker.ScrollDirection.DOWN;
                 scrollEvent.distance = 12; // pixels
                 PrimedTracker.getInstance().trackEvent(scrollEvent);
+
+                //CustomEvent example
+                PrimedTracker.CustomEvent customEvent = PrimedTracker.getInstance().new CustomEvent();
+                customEvent.eventType = "mycustomevent";
+
+                //Populate customProperties
+                Map<String, Object> props = new HashMap<>();
+                props.put("itemId", "abc123");
+
+                customEvent.customProperties = props;
+                PrimedTracker.getInstance().trackEvent(customEvent);
             }
         });
 
@@ -117,11 +132,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void initTrackers() {
 
-        //To get only a Primed instance for personalize and convert:
-        Primed.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443");
-        PrimedTracker.getInstance().init("mypubkey", "mysecretkey", "https://gw.staging.primed.io:443", MainActivity.this,"https://collector.staging.primed.io", 30);
-        String did = PrimedTracker.getInstance().getDid();
-        String sid = PrimedTracker.getInstance().getSid();
+
+        try {
+            Properties properties = new Properties();
+            InputStream inputStream = getAssets().open("local.properties");
+            properties.load(inputStream);
+            inputStream.close();
+
+            String publicKey = properties.getProperty("publicKey");
+            String secretKey = properties.getProperty("secretKey");
+            String gwURL = properties.getProperty("gwURL");
+            String collectorURL = properties.getProperty("collectorURL");
+
+            System.out.println(publicKey + ", " + secretKey + ", " + gwURL + ", " + collectorURL);
+
+            //To get only a Primed instance for personalize and convert:
+            Primed.getInstance().init(publicKey, secretKey, gwURL);
+            PrimedTracker.getInstance().init(publicKey, secretKey, gwURL, MainActivity.this,collectorURL, 30);
+            String did = PrimedTracker.getInstance().getDid();
+            String sid = PrimedTracker.getInstance().getSid();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 }
