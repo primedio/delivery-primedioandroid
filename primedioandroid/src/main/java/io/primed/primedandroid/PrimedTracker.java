@@ -190,7 +190,7 @@ final public class PrimedTracker {
     public class BaseEvent {
         public String eventName = "";
         String apiKey = public_key;
-        String ts = String.valueOf(System.currentTimeMillis());
+        long ts = System.currentTimeMillis();
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "APP";
