@@ -360,11 +360,11 @@ final public class PrimedTracker {
             super.eventObject.put("customProperties", customProperties);
             super.eventObject.put("uri", uri);
             super.eventObject.put("ua",result);
-            super.eventObject.put("now", String.valueOf(new Date(System.currentTimeMillis())));
-            super.eventObject.put("screenWidth", String.valueOf(size.x));
-            super.eventObject.put("screenHeight",  String.valueOf(size.y));
-            super.eventObject.put("viewPortWidth",  String.valueOf(size.x));
-            super.eventObject.put("viewPortHeight",  String.valueOf(size.y));
+            super.eventObject.put("now", new Date(System.currentTimeMillis()));
+            super.eventObject.put("screenWidth", size.x);
+            super.eventObject.put("screenHeight", size.y);
+            super.eventObject.put("viewPortWidth",  size.x);
+            super.eventObject.put("viewPortHeight",  size.y);
             super.createMap();
         }
     }
