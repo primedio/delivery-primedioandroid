@@ -179,6 +179,7 @@ public class Primed {
         HashMap<String, Object> signals = new HashMap<>();
         if (primedTrackerAvailable == true) {
             signals.put("did", PrimedTracker.getInstance().getDid());
+            signals.put("sid", PrimedTracker.getInstance().getSid());
         }
 
         this.personalise(campaign, signals, limit, abVariantLabel, callback);
@@ -190,6 +191,7 @@ public class Primed {
             //this will set the system defaults
             HashMap<String, Object> systemSignals = new HashMap<>();
             signals.put("did", PrimedTracker.getInstance().getDid());
+            signals.put("sid", PrimedTracker.getInstance().getSid());
 
             //Merge them together (will override existing values in the provided signals)
             signals.putAll(systemSignals);
