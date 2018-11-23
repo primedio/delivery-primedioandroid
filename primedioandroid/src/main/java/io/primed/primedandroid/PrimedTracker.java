@@ -2,6 +2,7 @@ package io.primed.primedandroid;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -355,6 +356,10 @@ final public class PrimedTracker {
             if (model.startsWith(manufacturer) == false) {
                 result = manufacturer + " " + model;
             }
+
+            String release = Build.VERSION.RELEASE;
+            int sdkVersion = Build.VERSION.SDK_INT;
+            result += ";" + release;
 
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
