@@ -49,5 +49,5 @@ ext {
     testRunnerVersion = "1.0.1"
     espressoCoreVersion = "3.0.1"
     libVersionCode = 0
-    libVersionName = "0.0.5"
+    libVersionName = "0.0.7"
 }

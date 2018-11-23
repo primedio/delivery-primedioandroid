@@ -199,7 +199,7 @@ final public class PrimedTracker {
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "APP";
-        String sdkVersion = "0.0.5";
+        String sdkVersion = "0.0.7";
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
