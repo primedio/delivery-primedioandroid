@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -14,9 +15,13 @@ import com.google.gson.GsonBuilder;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import io.socket.client.IO;
@@ -194,7 +199,7 @@ final public class PrimedTracker {
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "APP";
-        String sdkVersion = "0.0.6";
+        String sdkVersion = "0.0.7";
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -356,11 +361,18 @@ final public class PrimedTracker {
             Point size = new Point();
             display.getSize(size);
 
+            if (customProperties == null) {
+                customProperties = new HashMap();
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK);
+            String dateString = sdf.format(new Date());
+
             super.eventName = eventName;
             super.eventObject.put("customProperties", customProperties);
             super.eventObject.put("uri", uri);
             super.eventObject.put("ua",result);
-            super.eventObject.put("now", new Date(System.currentTimeMillis()));
+            super.eventObject.put("now", dateString);
             super.eventObject.put("screenWidth", size.x);
             super.eventObject.put("screenHeight", size.y);
             super.eventObject.put("viewPortWidth",  size.x);
