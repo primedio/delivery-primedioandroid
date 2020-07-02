@@ -1,10 +1,12 @@
 package io.primed.primedandroid;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -29,6 +31,9 @@ import io.socket.engineio.client.transports.WebSocket;
 
 import android.provider.Settings.Secure;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+
 final public class PrimedTracker {
 
     private static PrimedTracker sSoleInstance;
@@ -37,7 +42,6 @@ final public class PrimedTracker {
 
     private String trackingConnectionString;
 
-    private int heartbeatInterval;
     private int heartbeatCount;
 
     private String sid;
@@ -70,7 +74,16 @@ final public class PrimedTracker {
         return sSoleInstance;
     }
 
-    public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval) {
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public boolean isForeground() {
+        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
+    }
+
+    public void init(String publicKey, String secretKey, String connectionString, Context context, String trackingConnectionString, final int heartbeatInterval) {
+        Log.d("PrimedTracker", "Initializing PrimedTracker");
+
         Primed.getInstance().init(publicKey, secretKey, connectionString);
 
         String android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
@@ -80,7 +93,6 @@ final public class PrimedTracker {
         this.sid = UUID.randomUUID().toString();
         this.trackingConnectionString = trackingConnectionString + "/v1";
         this.context = context;
-        this.heartbeatInterval = heartbeatInterval;
 
         try {
             IO.Options options = new IO.Options();
@@ -97,11 +109,44 @@ final public class PrimedTracker {
             mSocket.on(Socket.EVENT_ERROR, onError);
             mSocket.connect();
         } catch (URISyntaxException e) {
+            Log.e("PrimedTracker", e.toString());
+        }
+
+        // start HEARTBEAT, please note the HEARTBEAT runnable keeps running in the background, even
+        // when the application is not in the foreground. It only emits HEARTBEAT events in the case
+        // that the application is in the foreground though - it also resets the HEARTBEAT counter
+        // and `sid` if it detects that it is running the background.
+        if (heartbeatInterval > 0 && heartbeatRunnable == null) {
+            heartbeatRunnable = new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+                @Override
+                public void run() {
+                    if (PrimedTracker.getInstance().isForeground()) {
+                        HeartbeatEvent beat = new HeartbeatEvent();
+                        trackEvent(beat);
+                        heartbeatCount += 1;
+                    } else {
+                        heartbeatCount = 0;
+                        PrimedTracker.getInstance().sid = UUID.randomUUID().toString();
+                    }
+
+                    Handler sHandler = new Handler(Looper.getMainLooper());
+                    sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
+
+                }
+            };
+
+            Handler sHandler = new Handler(Looper.getMainLooper());
+            sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
 
         }
 
-        Primed.getInstance().init(publicKey, secretKey, connectionString);
         Primed.getInstance().primedTrackerAvailable = true;
+
+        // Fire off START event upon init
+        StartEvent e = new StartEvent();
+        e.uri = "";
+        this.trackEvent(e);
     }
 
     public Emitter.Listener onConnect = new Emitter.Listener() {
@@ -109,25 +154,6 @@ final public class PrimedTracker {
         public void call(final Object... args) {
             Log.d("PrimedTracker", String.format("connected to %s", trackingConnectionString));
 
-            //start heartbeat:
-            if (heartbeatInterval > 0 && heartbeatRunnable == null) {
-                heartbeatCount = 1;
-
-                heartbeatRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        HeartbeatEvent beat = new HeartbeatEvent();
-                        trackEvent(beat);
-
-                        Handler sHandler = new Handler(Looper.getMainLooper());
-                        sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
-                    }
-                };
-
-                Handler sHandler = new Handler(Looper.getMainLooper());
-                sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
-
-            }
         }
     };
 
@@ -314,7 +340,6 @@ final public class PrimedTracker {
         public void createMap() {
             super.eventName = eventName;
             super.eventObject.put("i", heartbeatCount);
-            heartbeatCount += 1;
             super.createMap();
         }
     }
@@ -341,14 +366,13 @@ final public class PrimedTracker {
         public void createMap() {
             String manufacturer = Build.MANUFACTURER;
             String model = Build.MODEL;
-            String result = model;
+            String ua_string = model;
             if (model.startsWith(manufacturer) == false) {
-                result = manufacturer + " " + model;
+                ua_string = manufacturer + " " + model;
             }
 
             String release = Build.VERSION.RELEASE;
-            int sdkVersion = Build.VERSION.SDK_INT;
-            result += ";" + release;
+            ua_string += ";" + release;
 
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
@@ -367,7 +391,7 @@ final public class PrimedTracker {
             super.eventName = eventName;
             super.eventObject.put("customProperties", customProperties);
             super.eventObject.put("uri", uri);
-            super.eventObject.put("ua",result);
+            super.eventObject.put("ua",ua_string);
             super.eventObject.put("now", dateString);
             super.eventObject.put("screenWidth", size.x);
             super.eventObject.put("screenHeight", size.y);

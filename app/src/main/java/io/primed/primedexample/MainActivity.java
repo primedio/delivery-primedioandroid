@@ -79,11 +79,6 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                PrimedTracker.StartEvent e = PrimedTracker.getInstance().new StartEvent();
-                e.uri = "http://test";
-                PrimedTracker.getInstance().trackEvent(e);
-
                 //Click example
                 PrimedTracker.ClickEvent event = PrimedTracker.getInstance().new ClickEvent();
                 event.x = 1;
@@ -150,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 //            Primed.getInstance().init(publicKey, secretKey, gwURL);
 
 
-            PrimedTracker.getInstance().init(publicKey, secretKey, gwURL, MainActivity.this,collectorURL, 30);
+            PrimedTracker.getInstance().init(publicKey, secretKey, gwURL, MainActivity.this,collectorURL, 10);
             String did = PrimedTracker.getInstance().getDid();
             String sid = PrimedTracker.getInstance().getSid();
         } catch (IOException e) {
