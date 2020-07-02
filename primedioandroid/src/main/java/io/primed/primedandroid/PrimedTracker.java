@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -17,12 +16,10 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import io.socket.client.IO;
@@ -37,10 +34,9 @@ final public class PrimedTracker {
     private static PrimedTracker sSoleInstance;
 
     private String public_key;
-    private String nonce;
+
     private String trackingConnectionString;
-    private String connectionString;
-    private String sha512_signature;
+
     private int heartbeatInterval;
     private int heartbeatCount;
 
@@ -75,22 +71,14 @@ final public class PrimedTracker {
     }
 
     public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval) {
-        String nonce = String.valueOf(new Date().getTime());
-
-        String prepSignature = publicKey + secretKey + nonce;
-        String signature = Primed.createSHA512(prepSignature);
-
         Primed.getInstance().init(publicKey, secretKey, connectionString);
 
         String android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 
         this.public_key = publicKey;
-        this.sha512_signature = signature;
-        this.nonce = nonce;
         this.did = android_id;
         this.sid = UUID.randomUUID().toString();
         this.trackingConnectionString = trackingConnectionString + "/v1";
-        this.connectionString = connectionString;
         this.context = context;
         this.heartbeatInterval = heartbeatInterval;
 
@@ -112,6 +100,7 @@ final public class PrimedTracker {
 
         }
 
+        Primed.getInstance().init(publicKey, secretKey, connectionString);
         Primed.getInstance().primedTrackerAvailable = true;
     }
 
@@ -350,8 +339,8 @@ final public class PrimedTracker {
         public Map<String, Object> customProperties;
 
         public void createMap() {
-            String manufacturer = android.os.Build.MANUFACTURER;
-            String model = android.os.Build.MODEL;
+            String manufacturer = Build.MANUFACTURER;
+            String model = Build.MODEL;
             String result = model;
             if (model.startsWith(manufacturer) == false) {
                 result = manufacturer + " " + model;
@@ -364,7 +353,9 @@ final public class PrimedTracker {
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
             Point size = new Point();
-            display.getSize(size);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                display.getSize(size);
+            }
 
             if (customProperties == null) {
                 customProperties = new HashMap();
@@ -443,5 +434,117 @@ final public class PrimedTracker {
         public String toString() {
             return stringValue;
         }
+    }
+
+
+
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and using the default signals: if the <code>PrimedTracker</code> is initialized
+     * <code>sid</code> and <code>did</code> signals are automatically sent through. If
+     * <code>PrimedTracker</code> is not initialized the signals maps will be empty.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            final Primed.PrimedCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, limit, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and provided signals.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            final Primed.PrimedCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, signals, limit, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            String abVariantLabel,
+            final Primed.PrimedCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, limit, abVariantLabel, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            String abVariantLabel,
+            final Primed.PrimedCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, signals, limit, abVariantLabel, callback);
+    }
+
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * @param ruuid          the campaign for which to get results
+     *
+     * @since           0.0.1
+     */
+    public void convert(String ruuid) {
+        Primed.getInstance().convert(ruuid, null);
+    }
+
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * This call allows for an additional <code>data</code> payload, which may be specified in the
+     * project spec.
+     *
+     * @param ruuid          the campaign for which to get results
+     * @param data           number of desired results
+     *
+     * @since           0.0.1
+     */
+    public void convert(String ruuid, Map<String, Object> data) {
+        Primed.getInstance().convert(ruuid, data);
     }
 }

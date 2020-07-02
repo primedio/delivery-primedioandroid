@@ -146,8 +146,10 @@ public class MainActivity extends AppCompatActivity {
 
             System.out.println(publicKey + ", " + secretKey + ", " + gwURL + ", " + collectorURL);
 
-            //To get only a Primed instance for personalize and convert:
-            Primed.getInstance().init(publicKey, secretKey, gwURL);
+//            To get only a Primed instance for personalize and convert:
+//            Primed.getInstance().init(publicKey, secretKey, gwURL);
+
+
             PrimedTracker.getInstance().init(publicKey, secretKey, gwURL, MainActivity.this,collectorURL, 30);
             String did = PrimedTracker.getInstance().getDid();
             String sid = PrimedTracker.getInstance().getSid();

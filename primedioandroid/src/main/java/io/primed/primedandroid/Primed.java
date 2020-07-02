@@ -34,9 +34,7 @@ public class Primed {
     public Boolean primedTrackerAvailable;
     private String urlPrimedIO;
     private String public_key;
-    private String nonce;
-    private String sha512_signature;
-
+    private String secret_key;
 
     private Primed() {
         if (sSoleInstance != null){
@@ -53,15 +51,9 @@ public class Primed {
     }
 
     public void init(String publicKey, String secretKey, String url) {
-        String nonce = String.valueOf(System.currentTimeMillis() / 1000l);
-
-        String prepSignature = publicKey + secretKey + nonce;
-        String signature = Primed.createSHA512(prepSignature);
-
         this.urlPrimedIO = url;
         this.public_key = publicKey;
-        this.sha512_signature = signature;
-        this.nonce = nonce;
+        this.secret_key = secretKey;
     }
 
     public static String createSHA512(String input) {
@@ -85,12 +77,15 @@ public class Primed {
     }
 
     private void get(String url, final HttpCallback cb) {
+        String nonce = String.valueOf(System.currentTimeMillis() / 1000l);
+        String signature = Primed.createSHA512(this.public_key + this.secret_key + nonce);
+
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
                 .addHeader("X-Authorization-Key", this.public_key)
-                .addHeader("X-Authorization-Signature", this.sha512_signature)
-                .addHeader("X-Authorization-Nonce", this.nonce)
+                .addHeader("X-Authorization-Signature", signature)
+                .addHeader("X-Authorization-Nonce", nonce)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -112,7 +107,8 @@ public class Primed {
     }
 
     private void post(String url, Map<String, Object> params, final HttpCallback cb) {
-
+        String nonce = String.valueOf(System.currentTimeMillis() / 1000l);
+        String signature = Primed.createSHA512(this.public_key + this.secret_key + nonce);
 
         FormEncodingBuilder builder = new FormEncodingBuilder();
         if (params != null) {
@@ -126,8 +122,8 @@ public class Primed {
                 .url(url)
                 .method("POST", formBody )
                 .addHeader("X-Authorization-Key", this.public_key)
-                .addHeader("X-Authorization-Signature", this.sha512_signature)
-                .addHeader("X-Authorization-Nonce", this.nonce)
+                .addHeader("X-Authorization-Signature", signature)
+                .addHeader("X-Authorization-Nonce", nonce)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -147,35 +143,105 @@ public class Primed {
         });
     }
 
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * @param ruuid          the campaign for which to get results
+     *
+     * @since           0.0.1
+     */
     public void convert(String ruuid) {
-        this.convert(ruuid);
+        this.convert(ruuid, null);
     }
-    public void convert(String ruuid, Map<String, Object> data) {
 
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * This call allows for an additional <code>data</code> payload, which may be specified in the
+     * project spec.
+     *
+     * @param ruuid          the campaign for which to get results
+     * @param data           number of desired results
+     *
+     * @since           0.0.1
+     */
+    public void convert(String ruuid, Map<String, Object> data) {
         String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
 
        this.post(generateURL, data, new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
-               //do nothing?
+               // do nothing
            }
 
            @Override
            public void onSuccess(Response response) {
-//               String respBody = null;
-//               if (response.body() != null) {
-//                   try {
-//                       respBody = response.body().string();
-//                   } catch (IOException e) {
-//                       //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
-//                   }
-//               }
-               //do nothing?
+               // do nothing
            }
        });
     }
 
-    public void personalise(String campaign, int limit, String abVariantLabel, final PrimedCallback callback) {
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and using the default signals: if the <code>PrimedTracker</code> is initialized
+     * <code>sid</code> and <code>did</code> signals are automatically sent through. If
+     * <code>PrimedTracker</code> is not initialized the signals maps will be empty.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            final PrimedCallback callback
+    ) {
+        this.personalise(campaign, limit, null, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and provided signals.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            final Primed.PrimedCallback callback
+    ) {
+        this.personalise(campaign, signals, limit, null, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            String abVariantLabel,
+            final PrimedCallback callback
+    ) {
+
         HashMap<String, Object> signals = new HashMap<>();
         if (primedTrackerAvailable == true) {
             signals.put("did", PrimedTracker.getInstance().getDid());
@@ -185,7 +251,24 @@ public class Primed {
         this.personalise(campaign, signals, limit, abVariantLabel, callback);
     }
 
-    public void personalise(String campaign, Map<String, Object> signals, int limit, String abVariantLabel, final PrimedCallback callback) {
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            String abVariantLabel,
+            final PrimedCallback callback
+    ) {
 
         if (primedTrackerAvailable == true) {
             //this will set the system defaults
@@ -202,7 +285,9 @@ public class Primed {
         String generateURL = this.urlPrimedIO + "/api/v1/personalise?";
         generateURL += "campaign=" + campaign;
         generateURL += "&limit=" + limit;
-        generateURL += "&abvariant=" + abVariantLabel;
+        if (abVariantLabel != null ) {
+            generateURL += "&abvariant=" + abVariantLabel;
+        }
         generateURL += "&signals=" + signalsString;
 
         this.get(generateURL, new Primed.HttpCallback() {
