@@ -23,8 +23,8 @@ android {
     defaultConfig {
         minSdkVersion 6
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode rootProject.ext.libVersionCode
+        versionName rootProject.ext.libVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -56,8 +56,8 @@ dependencies {
 
 ext {
     // primedIO Library Info
-    targetSdkVersion = 27
-    minSdkVersion = 26
+    targetSdkVersion = 29
+    minSdkVersion = 14
     compileSdkVersion = targetSdkVersion
     buildToolsVersion = '27.0.3'
     supportLibVersion = '27.0.2'
@@ -65,8 +65,6 @@ ext {
     junitVersion = "4.12"
     testRunnerVersion = "1.0.1"
     espressoCoreVersion = "3.0.1"
-    libVersionCode = 0
-    libVersionName = "0.0.7"
 
     //For bintray and jcenter distribution
     bintrayRepo = 'maven'
@@ -81,7 +79,7 @@ ext {
     siteUrl = 'https://www.primed.io'
     gitUrl = 'https://gitlab.com/primedio/delivery-primedioandroid'
 
-    libraryVersion = "0.0.7"
+    libraryVersion = "0.0.8"
 
     developerId = 'mvdkroon'
     developerName = 'Matthijs van der Kroon'
