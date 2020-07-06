@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("MainActivity", resultSet.guuid);
 
                         for (Primed.Result res : resultSet.results) {
-                            Log.i("MainActivity", res.toString());
+                            Log.i("MainActivity", String.valueOf(res.value.get("title")));
                         }
                     }
 

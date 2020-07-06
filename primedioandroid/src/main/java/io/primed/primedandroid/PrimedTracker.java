@@ -367,7 +367,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class HeartbeatEvent extends BaseEvent {
+    final private class HeartbeatEvent extends BaseEvent {
         private String eventName = "heartbeat";
 
         public void createMap() {
@@ -391,7 +391,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class StartEvent extends BaseEvent {
+    final private class StartEvent extends BaseEvent {
         private String eventName = "start";
         public String uri;
         public Map<String, Object> customProperties;
@@ -434,7 +434,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class EndEvent extends BaseEvent {
+    final private class EndEvent extends BaseEvent {
         private String eventName = "end";
         public Map<String, Object> customProperties;
 
@@ -445,7 +445,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class PersonaliseEvent extends BaseEvent {
+    final class PersonaliseEvent extends BaseEvent {
         private String eventName = "personalise";
         public String guuid;
 
@@ -456,7 +456,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class ConvertEvent extends BaseEvent {
+    final class ConvertEvent extends BaseEvent {
         private String eventName = "convert";
         public String ruuid;
         public Map<String, Object> data;
