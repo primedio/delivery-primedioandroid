@@ -1,8 +1,10 @@
 package io.primed.primedandroid;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
-//import org.apache.http.conn.util.InetAddressUtils;
 
 public class Utils {
 
@@ -64,6 +66,7 @@ public class Utils {
      * @param interfaceName eth0, wlan0 or NULL=use first interface
      * @return  mac address or empty string
      */
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     public static String getMACAddress(String interfaceName) {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());

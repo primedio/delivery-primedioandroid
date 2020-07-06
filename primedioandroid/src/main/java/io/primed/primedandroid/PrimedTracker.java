@@ -58,6 +58,9 @@ final public class PrimedTracker {
         return sid;
     }
 
+    private boolean was_in_background;
+    private boolean was_in_foreground;
+
     Runnable heartbeatRunnable;
 
     private PrimedTracker() {
@@ -87,6 +90,9 @@ final public class PrimedTracker {
         Primed.getInstance().init(publicKey, secretKey, connectionString);
 
         String android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+
+        this.was_in_background = true;
+        this.was_in_background = false;
 
         this.public_key = publicKey;
         this.did = android_id;
@@ -121,13 +127,40 @@ final public class PrimedTracker {
                 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                 @Override
                 public void run() {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
                     if (PrimedTracker.getInstance().isForeground()) {
+                        was_in_foreground = true;
+
+                        if (was_in_background) {
+                            // The `was_in_background` flag tells us the application has been in the
+                            // background at some point in the past - we therefore emit a START
+                            // event and set the flag to false
+                            StartEvent e = new StartEvent();
+                            e.uri = "";
+                            trackEvent(e);
+                            was_in_background = false;
+                        }
+
                         HeartbeatEvent beat = new HeartbeatEvent();
                         trackEvent(beat);
                         heartbeatCount += 1;
+
+
                     } else {
+                        was_in_background = true;
+
+                        if (was_in_foreground) {
+                            // The `was_in_foreground` flag tells us the application has been in the
+                            // foreground at some point in the past, but it isn't anymore - we
+                            // therefore emit a END event and set the flag to false
+                            EndEvent e = new EndEvent();
+                            trackEvent(e);
+                            was_in_foreground = false;
+                        }
+
                         heartbeatCount = 0;
-                        PrimedTracker.getInstance().sid = UUID.randomUUID().toString();
+                        sid = UUID.randomUUID().toString();
                     }
 
                     Handler sHandler = new Handler(Looper.getMainLooper());
@@ -423,6 +456,23 @@ final public class PrimedTracker {
         }
     }
 
+    final public class ConvertEvent extends BaseEvent {
+        private String eventName = "convert";
+        public String ruuid;
+        public Map<String, Object> data;
+
+        public void createMap() {
+            super.eventName = eventName;
+            eventObject.put("ruuid", ruuid);
+
+            if (data != null) {
+                eventObject.put("data", data);
+            }
+
+            super.createMap();
+        }
+    }
+
     public enum InteractionType {
         LEFT("LEFT",0),
         RIGHT("RIGHT",1),
@@ -477,7 +527,7 @@ final public class PrimedTracker {
     public void personalise(
             String campaign,
             int limit,
-            final Primed.PrimedCallback callback
+            final Primed.PersonaliseCallback callback
     ) {
         Primed.getInstance().personalise(campaign, limit, callback);
     }
@@ -497,7 +547,7 @@ final public class PrimedTracker {
             String campaign,
             Map<String, Object> signals,
             int limit,
-            final Primed.PrimedCallback callback
+            final Primed.PersonaliseCallback callback
     ) {
         Primed.getInstance().personalise(campaign, signals, limit, callback);
     }
@@ -516,7 +566,7 @@ final public class PrimedTracker {
             String campaign,
             int limit,
             String abVariantLabel,
-            final Primed.PrimedCallback callback
+            final Primed.PersonaliseCallback callback
     ) {
         Primed.getInstance().personalise(campaign, limit, abVariantLabel, callback);
     }
@@ -537,7 +587,7 @@ final public class PrimedTracker {
             Map<String, Object> signals,
             int limit,
             String abVariantLabel,
-            final Primed.PrimedCallback callback
+            final Primed.PersonaliseCallback callback
     ) {
         Primed.getInstance().personalise(campaign, signals, limit, abVariantLabel, callback);
     }

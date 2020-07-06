@@ -1,20 +1,13 @@
 package io.primed.primedexample;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -47,15 +40,19 @@ public class MainActivity extends AppCompatActivity {
                 signals.put("userid", "someuserid");
 
                 //Personalise call, handle the response to personalise your data
-                Primed.getInstance().personalise("frontpage.recommendations", signals, 3, "A", new Primed.PrimedCallback() {
+                Primed.getInstance().personalise("frontpage.recommendations", signals, 3, "A", new Primed.PersonaliseCallback() {
                     @Override
-                    public void onSuccess(JSONObject responseObject) {
+                    public void onSuccess(Primed.ResultSet resultSet) {
+                        Log.i("MainActivity", resultSet.guuid);
 
+                        for (Primed.Result res : resultSet.results) {
+                            Log.i("MainActivity", res.toString());
+                        }
                     }
 
                     @Override
-                    public void onFailure() {
-
+                    public void onFailure(Throwable throwable) {
+                        Log.e("MainActivity", throwable.toString());
                     }
                 });
             }
@@ -110,14 +107,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Health example, 200 = ok
-                Primed.getInstance().health(new Primed.PrimedCallback() {
+                Primed.getInstance().health(new Primed.HealthCallback() {
                     @Override
-                    public void onSuccess(JSONObject responseObject) {
+                    public void onSuccess() {
 
                     }
 
                     @Override
-                    public void onFailure() {
+                    public void onFailure(Throwable throwable) {
 
                     }
                 });

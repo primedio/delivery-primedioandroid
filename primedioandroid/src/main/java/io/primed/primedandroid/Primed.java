@@ -11,26 +11,33 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Primed {
 
-    public interface PrimedCallback {
-        void onSuccess(JSONObject response);
-        void onFailure();
+    public interface PersonaliseCallback {
+        void onSuccess(ResultSet resultSet);
+        void onFailure(Throwable throwable);
+    }
+
+    public interface HealthCallback {
+        void onSuccess();
+        void onFailure(Throwable throwable);
     }
 
     private static Primed sSoleInstance;
 
-    public final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient();
     public Boolean primedTrackerAvailable;
     private String urlPrimedIO;
     private String public_key;
@@ -56,7 +63,7 @@ public class Primed {
         this.secret_key = secretKey;
     }
 
-    public static String createSHA512(String input) {
+    private static String createSHA512(String input) {
 
         String generatedSHA = null;
 
@@ -169,10 +176,10 @@ public class Primed {
      *
      * @since           0.0.1
      */
-    public void convert(String ruuid, Map<String, Object> data) {
+    public void convert(final String ruuid, final Map<String, Object> data) {
         String generateURL = this.urlPrimedIO + "/api/v1/conversion/" + ruuid;
 
-       this.post(generateURL, data, new Primed.HttpCallback() {
+        this.post(generateURL, data, new Primed.HttpCallback() {
            @Override
            public void onFailure(Response response, Throwable throwable) {
                // do nothing
@@ -180,9 +187,19 @@ public class Primed {
 
            @Override
            public void onSuccess(Response response) {
-               // do nothing
+               if (primedTrackerAvailable == true) {
+                   // If we are using the PrimedTracker, we also emit a CONVERT event
+                   PrimedTracker.ConvertEvent event = PrimedTracker.getInstance().new ConvertEvent();
+                   event.ruuid = ruuid;
+
+                   if (data != null) {
+                       event.data = data;
+                   }
+
+                   PrimedTracker.getInstance().trackEvent(event);
+               }
            }
-       });
+        });
     }
 
     /**
@@ -200,7 +217,7 @@ public class Primed {
     public void personalise(
             String campaign,
             int limit,
-            final PrimedCallback callback
+            final PersonaliseCallback callback
     ) {
         this.personalise(campaign, limit, null, callback);
     }
@@ -220,7 +237,7 @@ public class Primed {
             String campaign,
             Map<String, Object> signals,
             int limit,
-            final Primed.PrimedCallback callback
+            final PersonaliseCallback callback
     ) {
         this.personalise(campaign, signals, limit, null, callback);
     }
@@ -239,7 +256,7 @@ public class Primed {
             String campaign,
             int limit,
             String abVariantLabel,
-            final PrimedCallback callback
+            final PersonaliseCallback callback
     ) {
 
         HashMap<String, Object> signals = new HashMap<>();
@@ -267,7 +284,7 @@ public class Primed {
             Map<String, Object> signals,
             int limit,
             String abVariantLabel,
-            final PrimedCallback callback
+            final PersonaliseCallback callback
     ) {
 
         if (primedTrackerAvailable == true) {
@@ -293,24 +310,12 @@ public class Primed {
         this.get(generateURL, new Primed.HttpCallback() {
             @Override
             public void onFailure(Response response, Throwable throwable) {
-                callback.onFailure();
+                callback.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(Response response) {
-                if (primedTrackerAvailable == true) {
-                    PrimedTracker.PersonaliseEvent event = PrimedTracker.getInstance().new PersonaliseEvent();
-                    try {
-                        String jsonData = response.body().string();
-                        JSONObject responseJSON = new JSONObject(jsonData);
 
-                        String guuid = responseJSON.getString("guuid");
-                        event.guuid = guuid;
-                    } catch (Exception e) {
-
-                    }
-                    PrimedTracker.getInstance().trackEvent(event);
-                }
                 String respBody = null;
 
                 if (response.body() != null) {
@@ -324,45 +329,57 @@ public class Primed {
                 //Try to parse the response as json, and perform callback
                 try {
                     JSONObject responseJSON = new JSONObject(respBody);
-                    callback.onSuccess(responseJSON);
+
+                    String guuid = responseJSON.getString("guuid");
+
+                    if (primedTrackerAvailable == true) {
+                        // If we are using the PrimedTracker, we also emit a PERSONALISE event
+                        PrimedTracker.PersonaliseEvent event = PrimedTracker.getInstance().new PersonaliseEvent();
+                        event.guuid = guuid;
+                        PrimedTracker.getInstance().trackEvent(event);
+                    }
+
+                    ResultSet rs = new ResultSet(guuid);
+
+                    JSONArray res = responseJSON.getJSONArray("results");
+                    for (int i = 0 ; i < res.length(); i++) {
+                        JSONObject resJsonObj = res.getJSONObject(i);
+
+                        HashMap<String, Object> value_hashmap = new Gson().fromJson(
+                                resJsonObj.getJSONObject("target").getJSONObject("value").toString(),
+                                HashMap.class
+                        );
+
+                        Result result = new Result(resJsonObj.getString("ruuid"), value_hashmap);
+
+                        rs.addResult(result);
+                    }
+
+                    callback.onSuccess(rs);
                 } catch (Exception e) {
-                    //parsing was not successful, pass an empty object
-                    callback.onSuccess(new JSONObject());
+                    callback.onFailure(e);
                 }
             }
         });
 
     }
 
-    public void health(final PrimedCallback callback) {
+    public void health(final HealthCallback callback) {
 
        String generateURL = this.urlPrimedIO + "/api/v1/health";
 
        this.get(generateURL, new Primed.HttpCallback() {
             @Override
             public void onFailure(Response response, Throwable throwable) {
-                callback.onFailure();
+                callback.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(Response response) {
-                String respBody = null;
-
-                if (response.body() != null) {
-                    try {
-                        respBody = response.body().string();
-                    } catch (IOException e) {
-                        //throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
-                    }
-                }
-
-                //Try to parse the response as json, and perform callback
-                try {
-                    JSONObject responseJSON = new JSONObject(respBody);
-                    callback.onSuccess(responseJSON);
-                } catch (Exception e) {
-                    //parsing was not successful
-                    callback.onSuccess(new JSONObject());
+                if (response.code() == 200) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure(new Exception("Health check failed"));
                 }
             }
         });
@@ -378,7 +395,7 @@ public class Primed {
         return JSONObject;
     }
 
-    public interface HttpCallback  {
+    private interface HttpCallback  {
 
         /**
          * called when the server response was not 2xx or when an exception was thrown in the process
@@ -393,5 +410,35 @@ public class Primed {
          * @param response
          */
         public void onSuccess(Response response);
+    }
+
+    public class Result {
+        public String ruuid;
+        public Map<String, Object> value;
+
+        public Result(String ruuid, Map<String, Object> value) {
+            this.ruuid = ruuid;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(ruuid + ": " + value.toString());
+        }
+    }
+
+    public class ResultSet {
+        public String guuid;
+        public List<Result> results;
+
+        public ResultSet(String guuid) {
+            this.guuid = guuid;
+            this.results = new ArrayList<Result>();
+        }
+
+        public void addResult(Result result) {
+            this.results.add(result);
+        }
+
     }
 }
