@@ -1,10 +1,12 @@
 package io.primed.primedandroid;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -16,12 +18,10 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import io.socket.client.IO;
@@ -31,16 +31,17 @@ import io.socket.engineio.client.transports.WebSocket;
 
 import android.provider.Settings.Secure;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+
 final public class PrimedTracker {
 
     private static PrimedTracker sSoleInstance;
 
     private String public_key;
-    private String nonce;
+
     private String trackingConnectionString;
-    private String connectionString;
-    private String sha512_signature;
-    private int heartbeatInterval;
+
     private int heartbeatCount;
 
     private String sid;
@@ -56,6 +57,9 @@ final public class PrimedTracker {
     public String getSid() {
         return sid;
     }
+
+    private boolean was_in_background;
+    private boolean was_in_foreground;
 
     Runnable heartbeatRunnable;
 
@@ -73,25 +77,28 @@ final public class PrimedTracker {
         return sSoleInstance;
     }
 
-    public void init(String publicKey, String secretKey, String connectionString, Context context,  String trackingConnectionString, int heartbeatInterval) {
-        String nonce = String.valueOf(new Date().getTime());
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public boolean isForeground() {
+        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
+    }
 
-        String prepSignature = publicKey + secretKey + nonce;
-        String signature = Primed.createSHA512(prepSignature);
+    public void init(String publicKey, String secretKey, String connectionString, Context context, String trackingConnectionString, final int heartbeatInterval) {
+        Log.d("PrimedTracker", "Initializing PrimedTracker");
 
         Primed.getInstance().init(publicKey, secretKey, connectionString);
 
         String android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 
+        this.was_in_background = true;
+        this.was_in_background = false;
+
         this.public_key = publicKey;
-        this.sha512_signature = signature;
-        this.nonce = nonce;
         this.did = android_id;
         this.sid = UUID.randomUUID().toString();
         this.trackingConnectionString = trackingConnectionString + "/v1";
-        this.connectionString = connectionString;
         this.context = context;
-        this.heartbeatInterval = heartbeatInterval;
 
         try {
             IO.Options options = new IO.Options();
@@ -108,10 +115,71 @@ final public class PrimedTracker {
             mSocket.on(Socket.EVENT_ERROR, onError);
             mSocket.connect();
         } catch (URISyntaxException e) {
+            Log.e("PrimedTracker", e.toString());
+        }
+
+        // start HEARTBEAT, please note the HEARTBEAT runnable keeps running in the background, even
+        // when the application is not in the foreground. It only emits HEARTBEAT events in the case
+        // that the application is in the foreground though - it also resets the HEARTBEAT counter
+        // and `sid` if it detects that it is running the background.
+        if (heartbeatInterval > 0 && heartbeatRunnable == null) {
+            heartbeatRunnable = new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+                @Override
+                public void run() {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
+                    if (PrimedTracker.getInstance().isForeground()) {
+                        was_in_foreground = true;
+
+                        if (was_in_background) {
+                            // The `was_in_background` flag tells us the application has been in the
+                            // background at some point in the past - we therefore emit a START
+                            // event and set the flag to false
+                            StartEvent e = new StartEvent();
+                            e.uri = "";
+                            trackEvent(e);
+                            was_in_background = false;
+                        }
+
+                        HeartbeatEvent beat = new HeartbeatEvent();
+                        trackEvent(beat);
+                        heartbeatCount += 1;
+
+
+                    } else {
+                        was_in_background = true;
+
+                        if (was_in_foreground) {
+                            // The `was_in_foreground` flag tells us the application has been in the
+                            // foreground at some point in the past, but it isn't anymore - we
+                            // therefore emit a END event and set the flag to false
+                            EndEvent e = new EndEvent();
+                            trackEvent(e);
+                            was_in_foreground = false;
+                        }
+
+                        heartbeatCount = 0;
+                        sid = UUID.randomUUID().toString();
+                    }
+
+                    Handler sHandler = new Handler(Looper.getMainLooper());
+                    sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
+
+                }
+            };
+
+            Handler sHandler = new Handler(Looper.getMainLooper());
+            sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
 
         }
 
         Primed.getInstance().primedTrackerAvailable = true;
+
+        // Fire off START event upon init
+        StartEvent e = new StartEvent();
+        e.uri = "";
+        this.trackEvent(e);
     }
 
     public Emitter.Listener onConnect = new Emitter.Listener() {
@@ -119,25 +187,6 @@ final public class PrimedTracker {
         public void call(final Object... args) {
             Log.d("PrimedTracker", String.format("connected to %s", trackingConnectionString));
 
-            //start heartbeat:
-            if (heartbeatInterval > 0 && heartbeatRunnable == null) {
-                heartbeatCount = 1;
-
-                heartbeatRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        HeartbeatEvent beat = new HeartbeatEvent();
-                        trackEvent(beat);
-
-                        Handler sHandler = new Handler(Looper.getMainLooper());
-                        sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
-                    }
-                };
-
-                Handler sHandler = new Handler(Looper.getMainLooper());
-                sHandler.postDelayed(heartbeatRunnable, heartbeatInterval * 1000);
-
-            }
         }
     };
 
@@ -199,7 +248,7 @@ final public class PrimedTracker {
         String sid = PrimedTracker.getInstance().sid;
         String did = PrimedTracker.getInstance().did;
         String source = "APP";
-        String sdkVersion = "0.0.7";
+        String sdkVersion = "0.0.8";
 
         Map<String, Object> params = new HashMap<String, Object>();
         Map<String, Object> eventObject = new HashMap<String, Object>();
@@ -318,13 +367,12 @@ final public class PrimedTracker {
         }
     }
 
-    final public class HeartbeatEvent extends BaseEvent {
+    final private class HeartbeatEvent extends BaseEvent {
         private String eventName = "heartbeat";
 
         public void createMap() {
             super.eventName = eventName;
             super.eventObject.put("i", heartbeatCount);
-            heartbeatCount += 1;
             super.createMap();
         }
     }
@@ -343,23 +391,28 @@ final public class PrimedTracker {
         }
     }
 
-    final public class StartEvent extends BaseEvent {
+    final private class StartEvent extends BaseEvent {
         private String eventName = "start";
         public String uri;
         public Map<String, Object> customProperties;
 
         public void createMap() {
-            String manufacturer = android.os.Build.MANUFACTURER;
-            String model = android.os.Build.MODEL;
-            String result = model;
+            String manufacturer = Build.MANUFACTURER;
+            String model = Build.MODEL;
+            String ua_string = model;
             if (model.startsWith(manufacturer) == false) {
-                result = manufacturer + " " + model;
+                ua_string = manufacturer + " " + model;
             }
+
+            String release = Build.VERSION.RELEASE;
+            ua_string += ";" + release;
 
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
             Point size = new Point();
-            display.getSize(size);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                display.getSize(size);
+            }
 
             if (customProperties == null) {
                 customProperties = new HashMap();
@@ -371,7 +424,7 @@ final public class PrimedTracker {
             super.eventName = eventName;
             super.eventObject.put("customProperties", customProperties);
             super.eventObject.put("uri", uri);
-            super.eventObject.put("ua",result);
+            super.eventObject.put("ua",ua_string);
             super.eventObject.put("now", dateString);
             super.eventObject.put("screenWidth", size.x);
             super.eventObject.put("screenHeight", size.y);
@@ -381,7 +434,7 @@ final public class PrimedTracker {
         }
     }
 
-    final public class EndEvent extends BaseEvent {
+    final private class EndEvent extends BaseEvent {
         private String eventName = "end";
         public Map<String, Object> customProperties;
 
@@ -392,13 +445,30 @@ final public class PrimedTracker {
         }
     }
 
-    final public class PersonaliseEvent extends BaseEvent {
+    final class PersonaliseEvent extends BaseEvent {
         private String eventName = "personalise";
         public String guuid;
 
         public void createMap() {
             super.eventName = eventName;
             eventObject.put("guuid", guuid);
+            super.createMap();
+        }
+    }
+
+    final class ConvertEvent extends BaseEvent {
+        private String eventName = "convert";
+        public String ruuid;
+        public Map<String, Object> data;
+
+        public void createMap() {
+            super.eventName = eventName;
+            eventObject.put("ruuid", ruuid);
+
+            if (data != null) {
+                eventObject.put("data", data);
+            }
+
             super.createMap();
         }
     }
@@ -438,5 +508,117 @@ final public class PrimedTracker {
         public String toString() {
             return stringValue;
         }
+    }
+
+
+
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and using the default signals: if the <code>PrimedTracker</code> is initialized
+     * <code>sid</code> and <code>did</code> signals are automatically sent through. If
+     * <code>PrimedTracker</code> is not initialized the signals maps will be empty.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            final Primed.PersonaliseCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, limit, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results using server side A/B membership
+     * and provided signals.
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            final Primed.PersonaliseCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, signals, limit, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            int limit,
+            String abVariantLabel,
+            final Primed.PersonaliseCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, limit, abVariantLabel, callback);
+    }
+
+    /**
+     * Calls the personalise endpoint and returns a list of results for a given A/B variant label
+     *
+     * @param campaign          the campaign for which to get results
+     * @param signals           signals to be used for obtaining results
+     * @param limit             number of desired results
+     * @param abVariantLabel    force A/B variant
+     * @param callback          callback for results handling
+     *
+     * @since           0.0.8
+     */
+    public void personalise(
+            String campaign,
+            Map<String, Object> signals,
+            int limit,
+            String abVariantLabel,
+            final Primed.PersonaliseCallback callback
+    ) {
+        Primed.getInstance().personalise(campaign, signals, limit, abVariantLabel, callback);
+    }
+
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * @param ruuid          the campaign for which to get results
+     *
+     * @since           0.0.1
+     */
+    public void convert(String ruuid) {
+        Primed.getInstance().convert(ruuid, null);
+    }
+
+    /**
+     * Marks a result, identified using the <code>ruuid</code>, as converted. Typically this means a
+     * user clicked a recommendation. Upon clicking the recommendation, this method should be called
+     * along with the <code>ruuid</code> belonging to that recommended item to flag it as converted.
+     *
+     * This call allows for an additional <code>data</code> payload, which may be specified in the
+     * project spec.
+     *
+     * @param ruuid          the campaign for which to get results
+     * @param data           number of desired results
+     *
+     * @since           0.0.1
+     */
+    public void convert(String ruuid, Map<String, Object> data) {
+        Primed.getInstance().convert(ruuid, data);
     }
 }
